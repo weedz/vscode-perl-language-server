@@ -366,6 +366,7 @@ connection.onDefinition((definition) => {
 connection.onDidChangeWatchedFiles(async change => {
 	// Monitored files have change in VSCode
 
+	// FIXME: Does not detect when a folder is deleted? Workaround is to just reload the window when large changes happen..
 	for (const fileEvent of change.changes) {
 		//type: 1 = created, 2 = modified, 3 = deleted
 		if (fileEvent.type !== FileChangeType.Created) {
