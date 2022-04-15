@@ -44,14 +44,17 @@ let hasDiagnosticRelatedInformationCapability = false;
 const DEBUG_MEASURE_TIME = false;
 const DEBUG_MEASURE_SINGLE_FILE = false;
 
+let activeWorkspaceRoot: string;
 
 connection.onInitialize(async (params: InitializeParams) => {
 	const capabilities = params.capabilities;
 
 	// TODO: Support multiple workspace folders?
 	if (params.workspaceFolders?.length) {
+		activeWorkspaceRoot = params.workspaceFolders[0].uri.substring(7);
+
 		DEBUG_MEASURE_TIME && console.time("readWorkspace");
-		await readWorkspaceFolder(params.workspaceFolders[0].uri.substring(7));
+		await readWorkspaceFolder(activeWorkspaceRoot);
 		DEBUG_MEASURE_TIME && console.timeEnd("readWorkspace");
 	}
 
@@ -368,6 +371,10 @@ connection.onDidChangeWatchedFiles(async change => {
 
 	// FIXME: Does not detect when a folder is deleted? Workaround is to just reload the window when large changes happen..
 	for (const fileEvent of change.changes) {
+		if (!isValidDirectory(fileEvent.uri.substring(7))) {
+			continue;
+		}
+
 		//type: 1 = created, 2 = modified, 3 = deleted
 		if (fileEvent.type !== FileChangeType.Created) {
 			clearDefinitions(fileEvent.uri);
@@ -651,32 +658,35 @@ function clearDefinitions(documentURI: string) {
 	delete FILES[documentURI];
 }
 
-function validFile(fileName: string) {
+function isValidFile(fileName: string) {
 	return defs.file.test(fileName);
 }
 
 // FIXME: Move this to a config value
 const IGNORED_FOLDERS = [
-	"CLEAN",
+	"/CLEAN",
 	".git",
-	"_VERKTYG/Koddokumentation",
-	"_VERKTYG/Taggdokumentation",
+	"/_VERKTYG/Koddokumentation",
+	"/_VERKTYG/Taggdokumentation",
 	".vscode",
 	"node_modules",
-	"ci/docker/askas-environment/www",
-	"ci/docker/air-local/air-cdsuperstore/www",
-	"ci/docker/askas-environment/askas-ecommerce/init",
-	".tidyall.d/"
+	"/ci/docker/askas-environment/www",
+	"/ci/docker/air-local/air-cdsuperstore/www",
+	"/ci/docker/askas-environment/askas-ecommerce/init",
+	".tidyall.d"
 ];
 
-function validDirectory(fullPath: string) {
+function isValidDirectory(fullPath: string) {
 	const basename = path.basename(fullPath);
 	if (basename === "." || basename === "..") {
 		return false;
 	}
 
-	for (const folder of IGNORED_FOLDERS) {
-		if (fullPath.endsWith(folder)) {
+	for (let folder of IGNORED_FOLDERS) {
+		if (folder.startsWith("/")) {
+			folder = `${activeWorkspaceRoot}${folder}`;
+		}
+		if (fullPath.includes(folder)) {
 			return false;
 		}
 	}
@@ -690,7 +700,7 @@ async function readWorkspaceFolder(fullPath: string) {
 	for (const file of files) {
 		const currentFile = path.join(fullPath, file);
 		const stats = await fs.stat(currentFile);
-		if (validFile(file) || (stats.isDirectory() && validDirectory(currentFile))) {
+		if (isValidFile(file) || (stats.isDirectory() && isValidDirectory(currentFile))) {
 			if (stats.isDirectory()) {
 				readWorkspaceFolder(currentFile);
 			} else {
