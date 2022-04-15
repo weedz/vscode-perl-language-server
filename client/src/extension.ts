@@ -18,7 +18,7 @@ let client: LanguageClient;
 export function activate(context: ExtensionContext) {
 	// The server is implemented in node
 	const serverModule = context.asAbsolutePath(
-		path.join('server', 'out', 'server.js')
+		path.join('out', 'server.js')
 	);
 	// The debug options for the server
 	// --inspect=6009: runs the server in Node's Inspector mode so VS Code can attach to the server for debugging
@@ -40,8 +40,8 @@ export function activate(context: ExtensionContext) {
 		// Register the server for perl documents
 		documentSelector: [{ scheme: "file", language: "perl" }],
 		synchronize: {
-			// Notify the server about file changes to '.pl' files contained in the workspace
-			fileEvents: workspace.createFileSystemWatcher('**/*.{pl,pm,fcgi}')
+			// Notify the server about file changes to perl files contained in the workspace
+			fileEvents: workspace.createFileSystemWatcher("**/*.{pl,pm,fcgi}")
 		}
 	};
 
