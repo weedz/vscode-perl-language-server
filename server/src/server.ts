@@ -243,7 +243,7 @@ function getTargetLineInDocument(textDocument: TextDocumentIdentifier, position:
 			line: position.line + 1,
 			character: 0,
 		}
-	}).trim();
+	}).trimEnd();
 }
 
 function getPackageNameFromCursorPosition(textDocument: TextDocumentIdentifier, position: Position) {
@@ -254,22 +254,19 @@ function getPackageNameFromCursorPosition(textDocument: TextDocumentIdentifier, 
 		return;
 	}
 
-	let word = currentLine.substring(0, position.character).match(pattern)?.[1];
+	const prefix = currentLine.substring(0, position.character);
+	const suffix = currentLine.substring(position.character);
 
-	if (word) {
-		const start = currentLine.indexOf(word, position.character - word.length);
-		const end = currentLine.indexOf("::", position.character);
-		if (end !== -1) {
-			word = currentLine.substring(start, end);
-		} else {
-			const characterPatter = /[a-zA-Z0-9_:]/;
-			for (let i = position.character; i < currentLine.length && characterPatter.test(currentLine[i]); ++i) {
-				word = word.concat(currentLine[i]);
-			}
-		}
+	const match = prefix.match(pattern);
+	
+	const word = match?.[1];
+	if (!word || match?.index === undefined) {
+		return "";
 	}
 
-	return word || "";
+	const endString = suffix.match(/[^a-zA-Z0-9_]/)?.index || 0;
+
+	return currentLine.substring(match.index + 1, match.index + 1 + word.length + endString);
 }
 
 connection.onDefinition((definition) => {
