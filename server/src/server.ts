@@ -749,9 +749,9 @@ async function readWorkspaceFolder(fullPath: string) {
 			if (stats.isDirectory()) {
 				promises.push(readWorkspaceFolder(currentFile));
 			} else {
-				fs.readFile(currentFile).then(content => {
+				promises.push(fs.readFile(currentFile).then(content => {
 					readSingleFile(`file://${currentFile}`, content.toString());
-				});
+				}));
 			}
 		}
 	}
