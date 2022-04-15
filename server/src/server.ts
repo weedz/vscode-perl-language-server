@@ -237,43 +237,14 @@ connection.onDefinition((definition) => {
 
 	const definitions: DefinitionLink[] = [];
 
-	if (word) {
-		if (!word.includes("::")) {
-			// Find package scoped functions
-			const filePackage = FILES[definition.textDocument.uri];
-			for (const p of filePackage.packages) {
-				const funcs = FUNCTIONS[`${p.packageName}::${word}`] || [];
-				for (const f of funcs.filter(f => f.file === definition.textDocument.uri)) {
-					definitions.push({
-						targetUri: definition.textDocument.uri,
-						targetRange: {
-							start: {
-								line: f.line - 1,
-								character: 0
-							},
-							end: {
-								line: f.line - 1,
-								character: word.length + 4
-							}
-						},
-						targetSelectionRange: {
-							start: {
-								line: f.line - 1,
-								character: 0
-							},
-							end: {
-								line: f.line - 1,
-								character: word.length + 4
-							}
-						},
-					});
-				}
-			}
-		}
-		if (FUNCTIONS[word]) {
-			for (const f of FUNCTIONS[word]) {
+	if (!word.includes("::")) {
+		// Find package scoped functions
+		const filePackage = FILES[definition.textDocument.uri];
+		for (const p of filePackage.packages) {
+			const funcs = FUNCTIONS[`${p.packageName}::${word}`] || [];
+			for (const f of funcs.filter(f => f.file === definition.textDocument.uri)) {
 				definitions.push({
-					targetUri: f.file,
+					targetUri: definition.textDocument.uri,
 					targetRange: {
 						start: {
 							line: f.line - 1,
@@ -296,66 +267,93 @@ connection.onDefinition((definition) => {
 					},
 				});
 			}
-		} else {
-			// Lookup package
-			if (PACKAGES[word]) {
-				for (const f of PACKAGES[word].files) {
-					for (const p of FILES[f].packages.filter(p => p.packageName === word)) {
-						definitions.push({
-							targetUri: f,
-							targetRange: {
-								start: {
-									line: p.line - 1,
-									character: 0
-								},
-								end: {
-									line: p.line - 1,
-									character: word.length + 8
-								}
-							},
-							targetSelectionRange: {
-								start: {
-									line: p.line - 1,
-									character: 0
-								},
-								end: {
-									line: p.line - 1,
-									character: word.length + 8
-								}
-							},
-						});
-					}
-				}
-			}
 		}
-
-		if (!definitions.length) {
-			for (const [f, locations] of Object.entries(FUNCTIONS)) {
-				if (f.endsWith(word)) {
-					definitions.push(...locations.map(position => ({
-						targetUri: position.file,
+	}
+	if (FUNCTIONS[word]) {
+		for (const f of FUNCTIONS[word]) {
+			definitions.push({
+				targetUri: f.file,
+				targetRange: {
+					start: {
+						line: f.line - 1,
+						character: 0
+					},
+					end: {
+						line: f.line - 1,
+						character: word.length + 4
+					}
+				},
+				targetSelectionRange: {
+					start: {
+						line: f.line - 1,
+						character: 0
+					},
+					end: {
+						line: f.line - 1,
+						character: word.length + 4
+					}
+				},
+			});
+		}
+	} else {
+		// Lookup package
+		if (PACKAGES[word]) {
+			for (const f of PACKAGES[word].files) {
+				for (const p of FILES[f].packages.filter(p => p.packageName === word)) {
+					definitions.push({
+						targetUri: f,
 						targetRange: {
 							start: {
-								line: position.line - 1,
+								line: p.line - 1,
 								character: 0
 							},
 							end: {
-								line: position.line - 1,
+								line: p.line - 1,
 								character: word.length + 8
 							}
 						},
 						targetSelectionRange: {
 							start: {
-								line: position.line - 1,
+								line: p.line - 1,
 								character: 0
 							},
 							end: {
-								line: position.line - 1,
+								line: p.line - 1,
 								character: word.length + 8
 							}
 						},
-					})));
+					});
 				}
+			}
+		}
+	}
+
+	if (!definitions.length) {
+		for (const [f, locations] of Object.entries(FUNCTIONS)) {
+			if (f.endsWith(word)) {
+				definitions.push(...locations.map(position => ({
+					targetUri: position.file,
+					targetRange: {
+						start: {
+							line: position.line - 1,
+							character: 0
+						},
+						end: {
+							line: position.line - 1,
+							character: word.length + 8
+						}
+					},
+					targetSelectionRange: {
+						start: {
+							line: position.line - 1,
+							character: 0
+						},
+						end: {
+							line: position.line - 1,
+							character: word.length + 8
+						}
+					},
+				})));
 			}
 		}
 	}
@@ -379,61 +377,84 @@ connection.onDidChangeWatchedFiles(async change => {
 	}
 });
 
+function objectIsEmpty(obj: any) {
+	for (const key in obj) {
+		return false;
+	}
+	return true;
+}
+
+function getFlatPackageTree(packageName: string) {
+	if (objectIsEmpty(PACKAGES[packageName].packages)) {
+		return [packageName];
+	}
+	const packages: string[] = [];
+	if (PACKAGES[packageName].functions.length) {
+		packages.push(packageName);
+	}
+	for (const p of Object.keys(PACKAGES[packageName].packages)) {
+		packages.push(...getFlatPackageTree(`${packageName}::${p}`));
+	}
+
+	return packages;
+}
+
 // This handler provides the initial list of the completion items.
 connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
-		DEBUG_MEASURE_TIME && console.time("onCompletion");
+	DEBUG_MEASURE_TIME && console.time("onCompletion");
 
-		const word = getPackageNameFromCursorPosition(textDocumentPosition.textDocument, textDocumentPosition.position);
-		if (word === undefined) {
-			DEBUG_MEASURE_TIME && console.timeEnd("onCompletion");
-			return [];
-		}
+	const word = getPackageNameFromCursorPosition(textDocumentPosition.textDocument, textDocumentPosition.position);
+	if (word === undefined) {
+		DEBUG_MEASURE_TIME && console.timeEnd("onCompletion");
+		return [];
+	}
 
-		const documentURI = textDocumentPosition.textDocument.uri;
+	const documentURI = textDocumentPosition.textDocument.uri;
 
-		let packages: CompletionItem[] = [];
-		const functions: CompletionItem[] = [];
+	let packages: CompletionItem[] = [];
+	const functions: CompletionItem[] = [];
 
-		if (word?.includes("::")) {
-			const packageName = word.slice(0, word.lastIndexOf("::"));
-			if (PACKAGES[packageName]) {
-				packages = PACKAGES[packageName].packages.map(p => ({
-					label: p,
-					kind: CompletionItemKind.Module,
-				}));
-	
-				for (const f of PACKAGES[packageName].functions) {
-					functions.push({
-						label: f,
-						kind: CompletionItemKind.Function,
-					});
-				}
-			}
-		} else {
-			packages = Object.keys(PACKAGES).map(p => ({
+	if (word.includes("::")) {
+		const packageName = word.slice(0, word.lastIndexOf("::"));
+		if (PACKAGES[packageName]) {
+			const flatPackageTree = getFlatPackageTree(packageName).filter(p => p !== packageName);
+			packages = flatPackageTree.map(p => ({
 				label: p,
 				kind: CompletionItemKind.Module,
+				insertText: p.substring(packageName.length + 2), // skip "parent" package name and "::"
 			}));
 
-			for (const p of FILES[documentURI].packages) {
-				for (const f of PACKAGES[p.packageName].functions) {
-					functions.push({
-						label: `${p.packageName}::${f}`,
-						kind: CompletionItemKind.Function,
-					});
-				}
+			for (const f of PACKAGES[packageName].functions) {
+				functions.push({
+					label: f,
+					kind: CompletionItemKind.Function,
+				});
 			}
 		}
+	} else {
+		packages = Object.keys(PACKAGES).map(p => ({
+			label: p,
+			kind: CompletionItemKind.Module,
+		}));
 
-		// The pass parameter contains the position of the text document in
-		// which code complete got requested. For the example we ignore this
-		// info and always provide the same completion items.
-
-		DEBUG_MEASURE_TIME && console.timeEnd("onCompletion");
-
-		return functions.concat(packages);
+		for (const p of FILES[documentURI].packages) {
+			for (const f of PACKAGES[p.packageName].functions) {
+				functions.push({
+					label: `${p.packageName}::${f}`,
+					kind: CompletionItemKind.Function,
+				});
+			}
+		}
 	}
-);
+
+	// The pass parameter contains the position of the text document in
+	// which code complete got requested. For the example we ignore this
+	// info and always provide the same completion items.
+
+	DEBUG_MEASURE_TIME && console.timeEnd("onCompletion");
+
+	return functions.concat(packages);
+});
 
 // This handler resolves additional information for the item selected in
 // the completion list.
@@ -494,13 +515,18 @@ function processContent(fullPath: string, content: string) {
 				if (!PACKAGES[fullPackageTree]) {
 					PACKAGES[fullPackageTree] = {
 						files: [],
-						packages: [],
+						packages: {},
 						functions: [],
 					};
 				}
 			
 				if (i < packageTree.length - 1) {
-					PACKAGES[fullPackageTree].packages.push(packageTree[i+1]);
+					// FIXME: This is not the nicest thing i've seen...
+					if (PACKAGES[fullPackageTree].packages[packageTree[i+1]]) {
+						PACKAGES[fullPackageTree].packages[packageTree[i+1]]++;
+					} else {
+						PACKAGES[fullPackageTree].packages[packageTree[i+1]] = 1;
+					}
 				}
 			}
 			PACKAGES[packageName].files.push(fullPath);
@@ -551,7 +577,9 @@ function readSingleFile(fullPath: string, fileContent: string) {
 interface Packages {
 	[packageName: string]: {
 		files: string[]
-		packages: string[]
+		packages: {
+			[packageName: string]: number
+		}
 		functions: string[]
 	}
 }
@@ -582,7 +610,7 @@ const PACKAGES: Packages = {
 	main: {
 		files: [],
 		functions: [],
-		packages: [],
+		packages: {},
 	}
 };
 const FUNCTIONS: Functions = {};
