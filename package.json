@@ -1,18 +1,14 @@
 {
 	"name": "perl-language-server",
-	"description": "A language server example",
+	"description": "Perl language server",
 	"author": "Linus Björklund",
 	"license": "MIT",
 	"version": "1.0.0",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-extension-samples"
+		"url": "https://github.com/weedz/vscode-perl-language-server"
 	},
 	"publisher": "weedzcokie",
-	"categories": [],
-	"keywords": [
-		"multi-root ready"
-	],
 	"engines": {
 		"vscode": "^1.63.0"
 	},
