@@ -5,8 +5,6 @@
 import {
 	createConnection,
 	TextDocuments,
-	Diagnostic,
-	DiagnosticSeverity,
 	ProposedFeatures,
 	InitializeParams,
 	DidChangeConfigurationNotification,
@@ -135,25 +133,7 @@ connection.onDidChangeConfiguration(change => {
 			(change.settings.languageServerExample || defaultSettings)
 		);
 	}
-
-	// Revalidate all open text documents
-	// documents.all().forEach(validateTextDocument);
 });
-
-function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
-	if (!hasConfigurationCapability) {
-		return Promise.resolve(globalSettings);
-	}
-	let result = documentSettings.get(resource);
-	if (!result) {
-		result = connection.workspace.getConfiguration({
-			scopeUri: resource,
-			section: 'languageServerExample'
-		});
-		documentSettings.set(resource, result);
-	}
-	return result;
-}
 
 // Only keep settings for open documents
 documents.onDidClose(e => {
@@ -167,59 +147,16 @@ documents.onDidChangeContent(change => {
 	readSingleFile(change.document.uri, change.document.getText());
 });
 
-async function validateTextDocument(textDocument: TextDocument): Promise<void> {
-	// In this simple example we get the settings for every validate run.
-	const settings = await getDocumentSettings(textDocument.uri);
-
-	// The validator creates diagnostics for all uppercase words length 2 and more
-	const text = textDocument.getText();
-	const pattern = /\b[A-Z]{2,}\b/g;
-	let m: RegExpExecArray | null;
-
-	let problems = 0;
-	const diagnostics: Diagnostic[] = [];
-	while ((m = pattern.exec(text)) && problems < settings.maxNumberOfProblems) {
-		problems++;
-		const diagnostic: Diagnostic = {
-			severity: DiagnosticSeverity.Warning,
-			range: {
-				start: textDocument.positionAt(m.index),
-				end: textDocument.positionAt(m.index + m[0].length)
-			},
-			message: `${m[0]} is all uppercase.`,
-			source: 'ex'
-		};
-		if (hasDiagnosticRelatedInformationCapability) {
-			diagnostic.relatedInformation = [
-				{
-					location: {
-						uri: textDocument.uri,
-						range: Object.assign({}, diagnostic.range)
-					},
-					message: 'Spelling matters'
-				},
-				{
-					location: {
-						uri: textDocument.uri,
-						range: Object.assign({}, diagnostic.range)
-					},
-					message: 'Particularly for names'
-				}
-			];
-		}
-		diagnostics.push(diagnostic);
-	}
-
-	// Send the computed diagnostics to VSCode.
-	connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
-}
-
 connection.onDocumentSymbol((symbolParams): SymbolInformation[] => {
+	DEBUG_MEASURE_TIME && console.time("onDocumentSymbol()");
+
 	const documentURI = symbolParams.textDocument.uri;
 	if (!FILES[documentURI]) {
+		DEBUG_MEASURE_TIME && console.timeEnd("onDocumentSymbol()");
 		return [];
 	}
-	return Object.entries(FILES[documentURI].functions).map(([f, position]) => ({
+
+	const symbols = Object.entries(FILES[documentURI].functions).map(([f, position]) => ({
 		kind: SymbolKind.Function,
 		name: f,
 		location: {
@@ -230,12 +167,16 @@ connection.onDocumentSymbol((symbolParams): SymbolInformation[] => {
 					character: 0,
 				},
 				end: {
-					line: position.line - 1,
+					line: (position.endLine || position.line) - 1,
 					character: 0
 				}
 			}
 		}
 	}));
+
+	DEBUG_MEASURE_TIME && console.timeEnd("onDocumentSymbol()");
+
+	return symbols;
 });
 
 function getTargetLineInDocument(textDocument: TextDocumentIdentifier, position: Position) {
@@ -284,8 +225,11 @@ function getPackageNameFromCursorPosition(textDocument: TextDocumentIdentifier, 
 }
 
 connection.onDefinition((definition) => {
+	DEBUG_MEASURE_TIME && console.time("onDefinition()");
+
 	const word = getPackageNameFromCursorPosition(definition.textDocument, definition.position);
 	if (!word) {
+		DEBUG_MEASURE_TIME && console.timeEnd("onDefinition()");
 		return [];
 	}
 
@@ -416,6 +360,8 @@ connection.onDefinition((definition) => {
 		}
 	}
 
+	DEBUG_MEASURE_TIME && console.timeEnd("onDefinition()");
+
 	return definitions;
 });
 
@@ -524,6 +470,8 @@ function processContent(fullPath: string, content: string) {
 	// This holds the current "active" package name
 	let filePackageName = "main";
 
+	let lastFunctionName: string | null = null;
+
 	const lines = content.split("\n");
 	const packages: Files[0]["packages"] = [];
 	const functions: Files[0]["functions"] = {};
@@ -564,7 +512,14 @@ function processContent(fullPath: string, content: string) {
 			// Assumes a package definition has been created before we define functions in said package (?)
 			PACKAGES[filePackageName].functions.push(functionDefinition);
 
+			if (lastFunctionName) {
+				functions[lastFunctionName].endLine = i;
+			}
+
 			const packageAndFunction = `${filePackageName}::${functionDefinition}`;
+
+			lastFunctionName = packageAndFunction;
+
 			if (!FUNCTIONS[packageAndFunction]) {
 				FUNCTIONS[packageAndFunction] = [];
 			}
@@ -617,6 +572,7 @@ interface Files {
 		functions: {
 			[functionName: string]: {
 				line: number
+				endLine?: number
 			}
 		}
 	}
