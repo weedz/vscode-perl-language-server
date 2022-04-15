@@ -56,6 +56,11 @@ connection.onInitialize(async (params: InitializeParams) => {
 		DEBUG_MEASURE_TIME && console.time("readWorkspace");
 		await readWorkspaceFolder(activeWorkspaceRoot);
 		DEBUG_MEASURE_TIME && console.timeEnd("readWorkspace");
+		if (DEBUG_MEASURE_TIME) {
+			console.log("Files:", Object.keys(FILES).length);
+			console.log("Packages:", Object.keys(PACKAGES).length);
+			console.log("Functions:", Object.keys(FUNCTIONS).length);
+		}
 	}
 
 	// Does the client support the `workspace/configuration` request?
@@ -86,8 +91,8 @@ connection.onInitialize(async (params: InitializeParams) => {
 			},
 			definitionProvider: true,
 			documentSymbolProvider: true,
-			// workspaceSymbolProvider: true,
-
+			workspaceSymbolProvider: true,
+			// signatureHelpProvider: true, // TODO: Implement this?
 		},
 	};
 	if (hasWorkspaceFolderCapability) {
@@ -179,6 +184,46 @@ connection.onDocumentSymbol((symbolParams): SymbolInformation[] => {
 
 	DEBUG_MEASURE_TIME && console.timeEnd("onDocumentSymbol()");
 
+	return symbols;
+});
+
+connection.onWorkspaceSymbol((symbolParams): SymbolInformation[] => {
+	DEBUG_MEASURE_TIME && console.time("workspace-symbols");
+
+	const query = symbolParams.query.toLowerCase();
+	if (query.length === 0) {
+		DEBUG_MEASURE_TIME && console.timeEnd("workspace-symbols");
+		return [];
+	}
+
+	const symbols: SymbolInformation[] = [];
+
+	for (const [functionName, positions] of Object.entries(FUNCTIONS)) {
+		if (!functionName.toLowerCase().includes(query)) {
+			continue;
+		}
+		for (const position of positions) {
+			symbols.push({
+				kind: SymbolKind.Function,
+				name: functionName,
+				location: {
+					uri: position.file,
+					range: {
+						start: {
+							line: position.line - 1,
+							character: 0,
+						},
+						end: {
+							line: position.line,
+							character: 0,
+						},
+					}
+				}
+			});
+		}
+	}
+
+	DEBUG_MEASURE_TIME && console.timeEnd("workspace-symbols");
 	return symbols;
 });
 
@@ -697,12 +742,15 @@ function isValidDirectory(fullPath: string) {
 // NOTE: `fullPath` must be without `file://` protocol
 async function readWorkspaceFolder(fullPath: string) {
 	const files = await fs.readdir(fullPath);
+
+	const promises: Promise<void>[] = [];
+
 	for (const file of files) {
 		const currentFile = path.join(fullPath, file);
 		const stats = await fs.stat(currentFile);
 		if (isValidFile(file) || (stats.isDirectory() && isValidDirectory(currentFile))) {
 			if (stats.isDirectory()) {
-				readWorkspaceFolder(currentFile);
+				promises.push(readWorkspaceFolder(currentFile));
 			} else {
 				fs.readFile(currentFile).then(content => {
 					readSingleFile(`file://${currentFile}`, content.toString());
@@ -710,4 +758,6 @@ async function readWorkspaceFolder(fullPath: string) {
 			}
 		}
 	}
+
+	await Promise.all(promises);
 }
