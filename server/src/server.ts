@@ -19,7 +19,6 @@ import {
 
 import {
 	CompletionItem,
-	Definition,
 	DefinitionLink,
 	Position,
 	SymbolInformation,
@@ -32,7 +31,7 @@ import {
 } from 'vscode-languageserver-textdocument';
 
 import * as fs from "fs/promises";
-import path = require('path');
+import * as path from "path";
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -639,6 +638,7 @@ function validFile(fileName: string) {
 	return defs.file.test(fileName);
 }
 
+// FIXME: Move this to a config value
 const IGNORED_FOLDERS = [
 	"CLEAN",
 	".git",
