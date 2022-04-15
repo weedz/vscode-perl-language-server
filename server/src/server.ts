@@ -289,6 +289,8 @@ connection.onDefinition((definition) => {
 		return [];
 	}
 
+	// TODO:  Resolve something like Obj::A->new() to Obj::A::new
+
 	const definitions: DefinitionLink[] = [];
 
 	if (word) {
@@ -379,6 +381,36 @@ connection.onDefinition((definition) => {
 							},
 						});
 					}
+				}
+			}
+		}
+
+		if (!definitions.length) {
+			for (const [f, locations] of Object.entries(FUNCTIONS)) {
+				if (f.endsWith(word)) {
+					definitions.push(...locations.map(position => ({
+						targetUri: position.file,
+						targetRange: {
+							start: {
+								line: position.line - 1,
+								character: 0
+							},
+							end: {
+								line: position.line - 1,
+								character: word.length + 8
+							}
+						},
+						targetSelectionRange: {
+							start: {
+								line: position.line - 1,
+								character: 0
+							},
+							end: {
+								line: position.line - 1,
+								character: word.length + 8
+							}
+						},
+					})));
 				}
 			}
 		}
