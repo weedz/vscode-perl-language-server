@@ -223,6 +223,28 @@ connection.onWorkspaceSymbol((symbolParams): SymbolInformation[] => {
 		}
 	}
 
+	for (const [packageName, p] of Object.entries(PACKAGES)) {
+		for (const position of p.locations) {
+			symbols.push({
+				kind: SymbolKind.Module,
+				name: packageName,
+				location: {
+					uri: position.file,
+					range: {
+						start: {
+							line: position.line - 1,
+							character: 0,
+						},
+						end: {
+							line: position.line,
+							character: 0,
+						},
+					}
+				}
+			});
+		}
+	}
+
 	DEBUG_MEASURE_TIME && console.timeEnd("workspace-symbols");
 	return symbols;
 });
@@ -343,10 +365,10 @@ connection.onDefinition((definition) => {
 	} else {
 		// Lookup package
 		if (PACKAGES[word]) {
-			for (const f of PACKAGES[word].files) {
-				for (const p of FILES[f].packages.filter(p => p.packageName === word)) {
+			for (const location of PACKAGES[word].locations) {
+				for (const p of FILES[location.file].packages.filter(p => p.packageName === word)) {
 					definitions.push({
-						targetUri: f,
+						targetUri: location.file,
 						targetRange: {
 							start: {
 								line: p.line - 1,
@@ -564,7 +586,7 @@ function processContent(fullPath: string, content: string) {
 
 				if (!PACKAGES[fullPackageTree]) {
 					PACKAGES[fullPackageTree] = {
-						files: [],
+						locations: [],
 						packages: {},
 						functions: [],
 					};
@@ -579,7 +601,10 @@ function processContent(fullPath: string, content: string) {
 					}
 				}
 			}
-			PACKAGES[packageName].files.push(fullPath);
+			PACKAGES[packageName].locations.push({
+				file: fullPath,
+				line: i + 1
+			});
 
 			filePackageName = packageName;
 		}
@@ -626,7 +651,10 @@ function readSingleFile(fullPath: string, fileContent: string) {
 
 interface Packages {
 	[packageName: string]: {
-		files: string[]
+		locations: Array<{
+			file: string
+			line: number
+		}>
 		packages: {
 			[packageName: string]: number
 		}
@@ -658,7 +686,7 @@ interface Files {
 
 const PACKAGES: Packages = {
 	main: {
-		files: [],
+		locations: [],
 		functions: [],
 		packages: {},
 	}
@@ -687,8 +715,8 @@ function clearDefinitions(documentURI: string) {
 		}
 	
 		// Remove references to this file in PACKAGES
-		PACKAGES[packageName].files.splice(PACKAGES[packageName].files.indexOf(documentURI)>>>0, 1);
-		if (PACKAGES[packageName].files.length === 0) {
+		PACKAGES[packageName].locations.splice(PACKAGES[packageName].locations.findIndex(l => l.file === documentURI)>>>0, 1);
+		if (PACKAGES[packageName].locations.length === 0) {
 			delete PACKAGES[packageName];
 		} else {
 			// for (const f of PACKAGES[packageName].functions)
