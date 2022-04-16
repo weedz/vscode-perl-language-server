@@ -175,7 +175,7 @@ connection.onDocumentSymbol((symbolParams): SymbolInformation[] => {
 					character: 0,
 				},
 				end: {
-					line: (position.endLine || position.line) - 1,
+					line: position.endLine - 1,
 					character: 0
 				}
 			}
@@ -627,11 +627,12 @@ function processContent(fullPath: string, content: string) {
 
 			FUNCTIONS[packageAndFunction].push({
 				file: fullPath,
-				line: i + 1
+				line: i + 1,
 			});
 
 			functions[packageAndFunction] = {
-				line: i + 1
+				line: i + 1,
+				endLine: i + 1,
 			};
 		}
 	}
@@ -678,7 +679,7 @@ interface Files {
 		functions: {
 			[functionName: string]: {
 				line: number
-				endLine?: number
+				endLine: number
 			}
 		}
 	}
@@ -772,14 +773,14 @@ async function readWorkspaceFolder(fullPath: string) {
 
 	for (const file of files) {
 		const currentFile = path.join(fullPath, file);
-		const stats = await fs.stat(currentFile);
-		if (isValidFile(file) || (stats.isDirectory() && isValidDirectory(currentFile))) {
-			if (stats.isDirectory()) {
+		if (isValidFile(file)) {
+			promises.push(fs.readFile(currentFile).then(content => {
+				readSingleFile(`file://${currentFile}`, content.toString());
+			}));
+		} else {
+			const stats = await fs.stat(currentFile);
+			if (stats.isDirectory() && isValidDirectory(currentFile)) {
 				promises.push(readWorkspaceFolder(currentFile));
-			} else {
-				promises.push(fs.readFile(currentFile).then(content => {
-					readSingleFile(`file://${currentFile}`, content.toString());
-				}));
 			}
 		}
 	}
