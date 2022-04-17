@@ -553,9 +553,9 @@ const defs = {
 	file: /[.](pl|pm|fcgi)$/i,
 };
 
-function processContent(fullPath: string, content: string) {
+function processContent(documentURI: string, content: string) {
 	// This holds the current "active" package name
-	let filePackageName = "main";
+	let filePackageName = "";
 
 	let lastFunctionName: string | null = null;
 
@@ -596,7 +596,7 @@ function processContent(fullPath: string, content: string) {
 				}
 			}
 			PACKAGES[packageName].locations.push({
-				file: fullPath,
+				file: documentURI,
 				line: i + 1
 			});
 
@@ -604,7 +604,18 @@ function processContent(fullPath: string, content: string) {
 		}
 		const functionDefinition = line.match(defs.function)?.[1];
 		if (functionDefinition) {
-			// Assumes a package definition has been created before we define functions in said package (?)
+			if (!filePackageName) {
+				// Assume a missing "main" package definition
+				filePackageName = "main";
+				packages.push({
+					packageName: filePackageName,
+					line: 1,
+				});
+				PACKAGES[filePackageName].locations.push({
+					file: documentURI,
+					line: 1
+				});
+			}
 			PACKAGES[filePackageName].functions.push(functionDefinition);
 
 			if (lastFunctionName) {
@@ -620,7 +631,7 @@ function processContent(fullPath: string, content: string) {
 			}
 
 			FUNCTIONS[packageAndFunction].push({
-				file: fullPath,
+				file: documentURI,
 				line: i + 1,
 			});
 
@@ -635,7 +646,7 @@ function processContent(fullPath: string, content: string) {
 		functions[lastFunctionName].endLine = lines.length;
 	}
 
-	FILES[fullPath] = {
+	FILES[documentURI] = {
 		packages,
 		functions
 	};
@@ -718,8 +729,11 @@ function clearDefinitions(documentURI: string) {
 		if (PACKAGES[packageName].locations.length === 0) {
 			delete PACKAGES[packageName];
 		} else {
-			// for (const f of PACKAGES[packageName].functions)
-			PACKAGES[packageName].functions = PACKAGES[packageName].functions.filter(f => !file.functions[`${packageName}::${f}`]);
+			for (let i = PACKAGES[packageName].functions.length - 1; i > 0; --i) {
+				if (file.functions[`${packageName}::${PACKAGES[packageName].functions[i]}`]) {
+					PACKAGES[packageName].functions.splice(i, 1);
+				}
+			}
 		}
 	}
 	
