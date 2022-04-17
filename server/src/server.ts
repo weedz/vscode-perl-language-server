@@ -269,8 +269,6 @@ function getTargetLineInDocument(textDocument: TextDocumentIdentifier, position:
 }
 
 function getPackageNameFromCursorPosition(textDocument: TextDocumentIdentifier, position: Position) {
-	const pattern = /[^a-zA-Z0-9_:]?([a-zA-Z0-9_:]+)[^a-zA-Z0-9_:]?$/;
-
 	const currentLine = getTargetLineInDocument(textDocument, position);
 	if (currentLine === undefined) {
 		return;
@@ -279,7 +277,7 @@ function getPackageNameFromCursorPosition(textDocument: TextDocumentIdentifier, 
 	const prefix = currentLine.substring(0, position.character);
 	const suffix = currentLine.substring(position.character);
 
-	const prefixMatch = prefix.match(pattern)?.[1] || prefix;
+	const prefixMatch = prefix.match(/[^a-zA-Z0-9_:]?([a-zA-Z0-9_:]+)$/)?.[1] || prefix;
 	const suffixMatch = suffix.search(/[^a-zA-Z0-9_]/);
 
 	return prefixMatch.concat(suffix.substring(0, suffixMatch));
