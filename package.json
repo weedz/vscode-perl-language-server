@@ -41,11 +41,12 @@
 			}
 		}
 	},
+	"workspaces": [
+		"client",
+		"server"
+	],
 	"scripts": {
-		"compile": "tsc -b",
-		"watch": "tsc -b -w",
 		"lint": "eslint ./client/src ./server/src --ext .ts,.tsx",
-		"postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
 		"vscode:prepublish": "npm run esbuild-base -- --minify",
 		"esbuild-base": "esbuild extension=./client/src/extension.ts server=./server/src/server.ts --bundle --outdir=out --external:vscode --format=cjs --platform=node",
 		"esbuild": "npm run esbuild-base -- --sourcemap",

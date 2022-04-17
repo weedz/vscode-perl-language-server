@@ -1,11 +1,14 @@
 {
 	"compilerOptions": {
-		"module": "commonjs",
+		"module": "esnext",
 		"target": "es2022",
+		"strict": true,
+		"moduleResolution": "node",
 		"lib": ["es2021"],
 		"outDir": "out",
 		"rootDir": "src",
-		"sourceMap": true
+		"sourceMap": true,
+		"composite": true
 	},
 	"include": ["src"],
 	"exclude": ["node_modules", ".vscode-test"]

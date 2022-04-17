@@ -7,7 +7,6 @@
 **/tsconfig.base.json
 contributing.md
 .travis.yml
-client/node_modules/**
 client/out/test/**
 test_perl_workspace
 node_modules/
