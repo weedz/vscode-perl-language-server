@@ -10,3 +10,5 @@ contributing.md
 client/out/test/**
 test_perl_workspace
 node_modules/
+.eslintignore
+PLAN.md

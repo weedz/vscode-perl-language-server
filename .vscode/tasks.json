@@ -3,20 +3,7 @@
 	"tasks": [
 		{
 			"type": "npm",
-			"script": "compile",
-			"group": "build",
-			"presentation": {
-				"panel": "dedicated",
-				"reveal": "never"
-			},
-			"problemMatcher": [
-				"$tsc"
-			]
-		},
-		{
-			"type": "npm",
-			"script": "watch",
-			"isBackground": true,
+			"script": "esbuild",
 			"group": {
 				"kind": "build",
 				"isDefault": true
@@ -25,9 +12,46 @@
 				"panel": "dedicated",
 				"reveal": "never"
 			},
-			"problemMatcher": [
-				"$tsc-watch"
-			]
+			"problemMatcher": {
+				"pattern": [
+					{
+						"regexp": "> (.*?):([0-9]+):([0-9]+): (warning|error): (.+)$",
+						"file": 1,
+						"line": 2,
+						"column": 3,
+						"severity": 4,
+						"message": 5
+					}
+				]
+			},
+			"label": "npm: esbuild",
+			"detail": "npm run esbuild-base -- --sourcemap"
+		},
+		{
+			"type": "npm",
+			"script": "esbuild-watch",
+			"isBackground": true,
+			"group": "build",
+			"presentation": {
+				"panel": "dedicated",
+				"reveal": "never"
+			},
+			"problemMatcher": {
+				"pattern": {
+					"regexp": ""
+				},
+				"background": {
+					"activeOnStart": true,
+					"beginsPattern": {
+						"regexp": "\\[watch\\] build started"
+					},
+					"endsPattern": {
+						"regexp": "\\[watch\\] build finished"
+					}
+				}
+			},
+			"label": "npm: esbuild-watch",
+			"detail": "npm run esbuild-base -- --sourcemap --watch"
 		}
 	]
 }

@@ -8,7 +8,11 @@
 			"name": "Launch Client",
 			"runtimeExecutable": "${execPath}",
 			"args": ["--extensionDevelopmentPath=${workspaceRoot}"],
-			"outFiles": ["${workspaceRoot}/client/out/**/*.js"]
+			"outFiles": ["${workspaceRoot}/out/**/*.js"],
+			"preLaunchTask": {
+				"type": "npm",
+				"script": "esbuild-watch"
+			}
 		},
 		{
 			"type": "node",
@@ -28,7 +32,7 @@
 				"--extensionTestsPath=${workspaceRoot}/client/out/test/index",
 				"${workspaceRoot}/client/testFixture"
 			],
-			"outFiles": ["${workspaceRoot}/client/out/test/**/*.js"]
+			"outFiles": ["${workspaceRoot}/out/test/**/*.js"]
 		}
 	],
 	"compounds": [
