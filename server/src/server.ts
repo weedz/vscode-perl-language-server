@@ -637,6 +637,10 @@ function processContent(fullPath: string, content: string) {
 		}
 	}
 
+	if (lastFunctionName) {
+		functions[lastFunctionName].endLine = lines.length;
+	}
+
 	FILES[fullPath] = {
 		packages,
 		functions
