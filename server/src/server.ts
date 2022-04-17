@@ -279,16 +279,10 @@ function getPackageNameFromCursorPosition(textDocument: TextDocumentIdentifier, 
 	const prefix = currentLine.substring(0, position.character);
 	const suffix = currentLine.substring(position.character);
 
-	const match = prefix.match(pattern);
-	
-	const word = match?.[1];
-	if (!word || match?.index === undefined) {
-		return "";
-	}
+	const prefixMatch = prefix.match(pattern)?.[1] || prefix;
+	const suffixMatch = suffix.search(/[^a-zA-Z0-9_]/);
 
-	const endString = suffix.match(/[^a-zA-Z0-9_]/)?.index || 0;
-
-	return currentLine.substring(match.index + 1, match.index + 1 + word.length + endString);
+	return prefixMatch.concat(suffix.substring(0, suffixMatch));
 }
 
 connection.onDefinition((definition) => {
