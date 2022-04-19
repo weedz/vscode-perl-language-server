@@ -18,6 +18,7 @@ import {
 import {
 	CompletionItem,
 	DefinitionLink,
+	DocumentSymbol,
 	Position,
 	SymbolInformation,
 	SymbolKind,
@@ -155,7 +156,7 @@ documents.onDidChangeContent(change => {
 	readSingleFile(change.document.uri, change.document.getText());
 });
 
-connection.onDocumentSymbol((symbolParams): SymbolInformation[] => {
+connection.onDocumentSymbol((symbolParams): DocumentSymbol[] => {
 	DEBUG_MEASURE_TIME && console.time("onDocumentSymbol()");
 
 	const documentURI = symbolParams.textDocument.uri;
@@ -164,23 +165,55 @@ connection.onDocumentSymbol((symbolParams): SymbolInformation[] => {
 		return [];
 	}
 
-	const symbols = Object.entries(FILES[documentURI].functions).map(([f, position]) => ({
-		kind: SymbolKind.Function,
-		name: f,
-		location: {
-			uri: documentURI,
+	const symbols: DocumentSymbol[] = Object.entries(FILES[documentURI].functions).map(([f, position]) => {
+		const seperatorPosition = f.lastIndexOf("::");
+		const functionName = seperatorPosition !== -1 ? f.slice(seperatorPosition + 2) : f;
+		return {
+			kind: SymbolKind.Function,
+			name: functionName,
+			detail: f.slice(0, seperatorPosition),
 			range: {
 				start: {
 					line: position.line - 1,
-					character: 0,
+					character: 0
 				},
 				end: {
 					line: position.endLine - 1,
 					character: 0
 				}
+			},
+			selectionRange: {
+				start: {
+					line: position.line - 1,
+					character: 0
+				},
+				end: {
+					line: position.line - 1,
+					character: functionName.length + 4
+				}
 			}
-		}
-	}));
+		};
+	});
+
+	for (const p of FILES[documentURI].packages) {
+		const range = {
+			start: {
+				line: p.line - 1,
+				character: 0,
+			},
+			end: {
+				line: p.line - 1,
+				character: p.packageName.length + 8,
+			}
+		};
+		symbols.push({
+			kind: SymbolKind.Package,
+			name: p.packageName,
+			range,
+			selectionRange: range
+		});
+	}
+
 
 	DEBUG_MEASURE_TIME && console.timeEnd("onDocumentSymbol()");
 
@@ -268,7 +301,7 @@ function getTargetLineInDocument(textDocument: TextDocumentIdentifier, position:
 	}).trimEnd();
 }
 
-function getPackageNameFromCursorPosition(textDocument: TextDocumentIdentifier, position: Position) {
+function getIdentifierNameAtCursorPosition(textDocument: TextDocumentIdentifier, position: Position) {
 	const currentLine = getTargetLineInDocument(textDocument, position);
 	if (currentLine === undefined) {
 		return;
@@ -286,7 +319,7 @@ function getPackageNameFromCursorPosition(textDocument: TextDocumentIdentifier, 
 connection.onDefinition((definition) => {
 	DEBUG_MEASURE_TIME && console.time("onDefinition()");
 
-	const word = getPackageNameFromCursorPosition(definition.textDocument, definition.position);
+	const word = getIdentifierNameAtCursorPosition(definition.textDocument, definition.position);
 	if (!word) {
 		DEBUG_MEASURE_TIME && console.timeEnd("onDefinition()");
 		return [];
@@ -467,7 +500,7 @@ function getFlatPackageTree(packageName: string) {
 connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
 	DEBUG_MEASURE_TIME && console.time("onCompletion");
 
-	const word = getPackageNameFromCursorPosition(textDocumentPosition.textDocument, textDocumentPosition.position);
+	const word = getIdentifierNameAtCursorPosition(textDocumentPosition.textDocument, textDocumentPosition.position);
 	if (word === undefined) {
 		DEBUG_MEASURE_TIME && console.timeEnd("onCompletion");
 		return [];
