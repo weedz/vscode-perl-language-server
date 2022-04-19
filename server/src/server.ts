@@ -212,7 +212,7 @@ connection.onDocumentSymbol((symbolParams): DocumentSymbol[] => {
 				},
 				end: {
 					line: position.endLine - 1,
-					character: 0
+					character: functionName.length + 4
 				}
 			},
 			selectionRange: {

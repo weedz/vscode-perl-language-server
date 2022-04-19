@@ -30,6 +30,10 @@ sub add
     return $x + $y;
 }
 
+sub div { my ($x, $y) = @_; return $x / $y}
+sub sub { my ($x, $y) = @_; return $x - $y}
+
+
 package Math::Advanced;
 use strict;
 use warnings;
