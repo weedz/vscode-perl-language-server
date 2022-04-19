@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"author": "Linus Björklund",
 	"license": "MIT",
-	"publisher": "weedzcokie",
+	"publisher": "linus-bjorklund",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/weedz/vscode-perl-language-server"

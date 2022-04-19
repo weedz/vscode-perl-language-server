@@ -1,14 +1,14 @@
 {
-	"name": "perl-language-server",
+	"name": "perl-lsp",
 	"description": "Perl language server",
 	"author": "Linus Björklund",
 	"license": "MIT",
-	"version": "1.0.0-beta.8",
+	"version": "1.0.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/weedz/vscode-perl-language-server"
 	},
-	"publisher": "weedzcokie",
+	"publisher": "linus-bjorklund",
 	"engines": {
 		"vscode": "^1.63.0"
 	},
