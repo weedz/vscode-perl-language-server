@@ -1,6 +1,7 @@
 # Perl language server for vscode
 
 [![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/weedz/vscode-perl-language-server?include_prereleases&style=for-the-badge)](https://github.com/weedz/vscode-perl-language-server/releases)
+[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/linus-bjorklund.perl-lsp?style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=linus-bjorklund.perl-lsp)
 
 Performs a really basic static analyze of perl code to provide the following:
 
