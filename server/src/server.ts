@@ -614,6 +614,11 @@ documents.listen(connection);
 // Listen on the connection
 connection.listen();
 
+connection.onShutdown(() => {
+	if (watcher) {
+		watcher.close();
+	}
+});
 
 
 const defs = {
