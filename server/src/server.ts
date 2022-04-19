@@ -432,7 +432,7 @@ connection.onDefinition((definition) => {
 						},
 						end: {
 							line: position.line - 1,
-							character: word.length + 8
+							character: f.length + 4
 						}
 					},
 					targetSelectionRange: {
@@ -442,7 +442,7 @@ connection.onDefinition((definition) => {
 						},
 						end: {
 							line: position.line - 1,
-							character: word.length + 8
+							character: f.length + 4
 						}
 					},
 				})));
