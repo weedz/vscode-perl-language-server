@@ -19,15 +19,23 @@
 	"contributes": {
 		"configuration": {
 			"type": "object",
-			"title": "Example configuration",
+			"title": "Perl language server",
 			"properties": {
-				"languageServerExample.maxNumberOfProblems": {
+				"perlLanguageServer.maxNumberOfProblems": {
 					"scope": "resource",
 					"type": "number",
 					"default": 100,
 					"description": "Controls the maximum number of problems produced by the server."
 				},
-				"languageServerExample.trace.server": {
+				"perlLanguageServer.ignoreFolders": {
+					"scope": "window",
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"description": "Folders to exclude"
+				},
+				"perlLanguageServer.trace.server": {
 					"scope": "window",
 					"type": "string",
 					"enum": [

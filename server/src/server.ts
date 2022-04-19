@@ -54,15 +54,6 @@ connection.onInitialize(async (params: InitializeParams) => {
 	// TODO: Support multiple workspace folders?
 	if (params.workspaceFolders?.length) {
 		activeWorkspaceRoot = params.workspaceFolders[0].uri.substring(7);
-
-		DEBUG_MEASURE_TIME && console.time("readWorkspace");
-		await readWorkspaceFolder(activeWorkspaceRoot);
-		DEBUG_MEASURE_TIME && console.timeEnd("readWorkspace");
-		if (DEBUG_MEASURE_TIME) {
-			console.log("Files:", Object.keys(FILES).length);
-			console.log("Packages:", Object.keys(PACKAGES).length);
-			console.log("Functions:", Object.keys(FUNCTIONS).length);
-		}
 	}
 
 	// Does the client support the `workspace/configuration` request?
@@ -107,7 +98,7 @@ connection.onInitialize(async (params: InitializeParams) => {
 	return result;
 });
 
-connection.onInitialized(() => {
+connection.onInitialized(async _ => {
 	if (hasConfigurationCapability) {
 		// Register for all configuration changes.
 		connection.client.register(DidChangeConfigurationNotification.type, undefined);
@@ -118,23 +109,36 @@ connection.onInitialized(() => {
 			connection.console.log('Workspace folder change event received.');
 		});
 	}
+
+	const settings = await getDocumentSettings("global");
+	IGNORED_FOLDERS = settings.ignoreFolders;
+
+	DEBUG_MEASURE_TIME && console.time("readWorkspace");
+	await readWorkspaceFolder(activeWorkspaceRoot);
+	DEBUG_MEASURE_TIME && console.timeEnd("readWorkspace");
+	if (DEBUG_MEASURE_TIME) {
+		console.log("Files:", Object.keys(FILES).length);
+		console.log("Packages:", Object.keys(PACKAGES).length);
+		console.log("Functions:", Object.keys(FUNCTIONS).length);
+	}
 });
 
 // The example settings
 interface ExampleSettings {
 	maxNumberOfProblems: number;
+	ignoreFolders: string[];
 }
 
 // The global settings, used when the `workspace/configuration` request is not supported by the client.
 // Please note that this is not the case when using this server with the client provided in this example
 // but could happen with other clients.
-const defaultSettings: ExampleSettings = { maxNumberOfProblems: 1000 };
+const defaultSettings: ExampleSettings = { maxNumberOfProblems: 1000, ignoreFolders: [] };
 let globalSettings: ExampleSettings = defaultSettings;
 
-// Cache the settings of all open documents
+// Cache the settings of all open documents, but we only need one global settings object.
 const documentSettings: Map<string, Thenable<ExampleSettings>> = new Map();
 
-connection.onDidChangeConfiguration(change => {
+connection.onDidChangeConfiguration(async change => {
 	if (hasConfigurationCapability) {
 		// Reset all cached document settings
 		documentSettings.clear();
@@ -143,12 +147,25 @@ connection.onDidChangeConfiguration(change => {
 			(change.settings.languageServerExample || defaultSettings)
 		);
 	}
+
+	await getDocumentSettings("global");
+	// TODO: Check if ignoreFolders have changed and call readWorkspaceFolder()
 });
 
-// Only keep settings for open documents
-documents.onDidClose(e => {
-	documentSettings.delete(e.document.uri);
-});
+function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
+	if (!hasConfigurationCapability) {
+		return Promise.resolve(globalSettings);
+	}
+	let result = documentSettings.get(resource);
+	if (!result) {
+		result = connection.workspace.getConfiguration({
+			scopeUri: resource,
+			section: "perlLanguageServer"
+		});
+		documentSettings.set(resource, result);
+	}
+	return result;
+}
 
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
@@ -263,7 +280,7 @@ connection.onWorkspaceSymbol((symbolParams): SymbolInformation[] => {
 		}
 		for (const position of p.locations) {
 			symbols.push({
-				kind: SymbolKind.Module,
+				kind: SymbolKind.Package,
 				name: packageName,
 				location: {
 					uri: position.file,
@@ -604,7 +621,6 @@ connection.listen();
 
 
 const defs = {
-	functions: /^\s*sub\s+([a-zA-Z0-9_]+)/gm,
 	function: /^\s*sub\s+([a-zA-Z0-9_]+)/,
 	package: /^package\s+([a-zA-Z0-9:_]+);/m,
 	file: /[.](pl|pm|fcgi)$/i,
@@ -802,19 +818,7 @@ function isValidFile(fileName: string) {
 	return defs.file.test(fileName);
 }
 
-// FIXME: Move this to a config value
-const IGNORED_FOLDERS = [
-	"/CLEAN",
-	".git",
-	"/_VERKTYG/Koddokumentation",
-	"/_VERKTYG/Taggdokumentation",
-	".vscode",
-	"node_modules",
-	"/ci/docker/askas-environment/www",
-	"/ci/docker/air-local/air-cdsuperstore/www",
-	"/ci/docker/askas-environment/askas-ecommerce/init",
-	".tidyall.d"
-];
+let IGNORED_FOLDERS: ExampleSettings["ignoreFolders"] = [];
 
 function isValidDirectory(fullPath: string) {
 	const basename = path.basename(fullPath);
