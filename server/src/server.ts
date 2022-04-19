@@ -258,6 +258,9 @@ connection.onWorkspaceSymbol((symbolParams): SymbolInformation[] => {
 	}
 
 	for (const [packageName, p] of Object.entries(PACKAGES)) {
+		if (!packageName.toLowerCase().includes(query)) {
+			continue;
+		}
 		for (const position of p.locations) {
 			symbols.push({
 				kind: SymbolKind.Module,
