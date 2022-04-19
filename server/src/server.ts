@@ -11,8 +11,7 @@ import {
 	CompletionItemKind,
 	TextDocumentPositionParams,
 	TextDocumentSyncKind,
-	InitializeResult,
-	FileChangeType
+	InitializeResult
 } from 'vscode-languageserver/node';
 
 import {
@@ -31,9 +30,12 @@ import {
 
 import * as fs from "fs/promises";
 import * as path from "path";
+import { watch, FSWatcher } from "chokidar";
 
 const DEBUG_MEASURE_TIME = false;
 const DEBUG_MEASURE_SINGLE_FILE = false;
+
+let watcher: FSWatcher;
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -44,7 +46,7 @@ const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = true;
-let hasDiagnosticRelatedInformationCapability = false;
+// let hasDiagnosticRelatedInformationCapability = false;
 
 let activeWorkspaceRoot: string;
 
@@ -64,11 +66,11 @@ connection.onInitialize(async (params: InitializeParams) => {
 	hasWorkspaceFolderCapability = !!(
 		capabilities.workspace && !!capabilities.workspace.workspaceFolders
 	);
-	hasDiagnosticRelatedInformationCapability = !!(
-		capabilities.textDocument &&
-		capabilities.textDocument.publishDiagnostics &&
-		capabilities.textDocument.publishDiagnostics.relatedInformation
-	);
+	// hasDiagnosticRelatedInformationCapability = !!(
+	// 	capabilities.textDocument &&
+	// 	capabilities.textDocument.publishDiagnostics &&
+	// 	capabilities.textDocument.publishDiagnostics.relatedInformation
+	// );
 
 	const result: InitializeResult = {
 		capabilities: {
@@ -80,7 +82,7 @@ connection.onInitialize(async (params: InitializeParams) => {
 			completionProvider: {
 				// TODO: This could maybe add argument lists or parse comment/doc for the given function?
 				// resolveProvider: true,
-				triggerCharacters: ["::"]
+				// triggerCharacters: []
 			},
 			definitionProvider: true,
 			documentSymbolProvider: true,
@@ -113,14 +115,27 @@ connection.onInitialized(async _ => {
 	const settings = await getDocumentSettings("global");
 	IGNORED_FOLDERS = settings.ignoreFolders;
 
-	DEBUG_MEASURE_TIME && console.time("readWorkspace");
-	await readWorkspaceFolder(activeWorkspaceRoot);
-	DEBUG_MEASURE_TIME && console.timeEnd("readWorkspace");
-	if (DEBUG_MEASURE_TIME) {
-		console.log("Files:", Object.keys(FILES).length);
-		console.log("Packages:", Object.keys(PACKAGES).length);
-		console.log("Functions:", Object.keys(FUNCTIONS).length);
-	}
+	// This solves renamed/deleted folders not emiting filewatch events
+	watcher = watch("**/*.{pl,pm,fcgi}", {
+		cwd: activeWorkspaceRoot,
+		ignored: IGNORED_FOLDERS,
+		persistent: true
+	});
+	watcher.on("unlink", filePath => {
+		clearDefinitions(`file://${activeWorkspaceRoot}/${filePath}`);
+	});
+	watcher.on("add", filePath => {
+		clearDefinitions(`file://${activeWorkspaceRoot}/${filePath}`);
+		fs.readFile(`${activeWorkspaceRoot}/${filePath}`).then(content => {
+			readSingleFile(`file://${activeWorkspaceRoot}/${filePath}`, content.toString());
+		});
+	});
+	watcher.on("change", (filePath, _stats) => {
+		clearDefinitions(`file://${activeWorkspaceRoot}/${filePath}`);
+		fs.readFile(`${activeWorkspaceRoot}/${filePath}`).then(content => {
+			readSingleFile(`file://${activeWorkspaceRoot}/${filePath}`, content.toString());
+		});
+	});
 });
 
 // The example settings
@@ -231,7 +246,6 @@ connection.onDocumentSymbol((symbolParams): DocumentSymbol[] => {
 			selectionRange: range
 		});
 	}
-
 
 	DEBUG_MEASURE_TIME && console.timeEnd("onDocumentSymbol()");
 
@@ -497,24 +511,6 @@ connection.onDefinition((definition) => {
 	return definitions;
 });
 
-connection.onDidChangeWatchedFiles(async change => {
-	// Monitored files have change in VSCode
-
-	// FIXME: Does not detect when a folder is deleted? Workaround is to just reload the window when large changes happen.. (https://github.com/microsoft/vscode/pull/110858)
-	for (const fileEvent of change.changes) {
-		if (!isValidDirectory(fileEvent.uri.substring(7))) {
-			continue;
-		}
-
-		//type: 1 = created, 2 = modified, 3 = deleted
-		if (fileEvent.type !== FileChangeType.Created) {
-			clearDefinitions(fileEvent.uri);
-		}
-		if (fileEvent.type !== FileChangeType.Deleted) {
-			readSingleFile(fileEvent.uri, (await fs.readFile(new URL(fileEvent.uri))).toString());
-		}
-	}
-});
 
 function objectIsEmpty(obj: any) {
 	for (const key in obj) {
@@ -627,6 +623,11 @@ const defs = {
 };
 
 function processContent(documentURI: string, content: string) {
+	if (FILES[documentURI]) {
+		console.log("already read this file:", documentURI);
+		return;
+	}
+
 	// This holds the current "active" package name
 	let filePackageName = "";
 

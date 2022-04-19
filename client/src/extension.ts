@@ -39,10 +39,11 @@ export function activate(context: ExtensionContext) {
 	const clientOptions: LanguageClientOptions = {
 		// Register the server for perl documents
 		documentSelector: [{ scheme: "file", language: "perl" }],
-		synchronize: {
-			// Notify the server about file changes to perl files contained in the workspace
-			fileEvents: workspace.createFileSystemWatcher("**/*.{pl,pm,fcgi}")
-		}
+		// We listen on filewatch changes with chokidar on the server
+		// synchronize: {
+		// 	// Notify the server about file changes to perl files contained in the workspace
+		// 	fileEvents: workspace.createFileSystemWatcher("**/*.{pl,pm,fcgi}")
+		// }
 	};
 
 	// Create the language client and start the client.
