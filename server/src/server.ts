@@ -301,7 +301,7 @@ function getTargetLineInDocument(textDocument: TextDocumentIdentifier, position:
 	}).trimEnd();
 }
 
-function getIdentifierNameAtCursorPosition(textDocument: TextDocumentIdentifier, position: Position) {
+function getIdentifierNameAtPosition(textDocument: TextDocumentIdentifier, position: Position) {
 	const currentLine = getTargetLineInDocument(textDocument, position);
 	if (currentLine === undefined) {
 		return;
@@ -313,13 +313,13 @@ function getIdentifierNameAtCursorPosition(textDocument: TextDocumentIdentifier,
 	const prefixMatch = prefix.match(/[^a-zA-Z0-9_:]?([a-zA-Z0-9_:]+)$/)?.[1] || prefix;
 	const suffixMatch = suffix.search(/[^a-zA-Z0-9_]/);
 
-	return prefixMatch.concat(suffix.substring(0, suffixMatch));
+	return prefixMatch.concat(suffixMatch !== -1 ? suffix.substring(0, suffixMatch) : suffix);
 }
 
 connection.onDefinition((definition) => {
 	DEBUG_MEASURE_TIME && console.time("onDefinition()");
 
-	const word = getIdentifierNameAtCursorPosition(definition.textDocument, definition.position);
+	const word = getIdentifierNameAtPosition(definition.textDocument, definition.position);
 	if (!word) {
 		DEBUG_MEASURE_TIME && console.timeEnd("onDefinition()");
 		return [];
@@ -500,7 +500,7 @@ function getFlatPackageTree(packageName: string) {
 connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
 	DEBUG_MEASURE_TIME && console.time("onCompletion");
 
-	const word = getIdentifierNameAtCursorPosition(textDocumentPosition.textDocument, textDocumentPosition.position);
+	const word = getIdentifierNameAtPosition(textDocumentPosition.textDocument, textDocumentPosition.position);
 	if (word === undefined) {
 		DEBUG_MEASURE_TIME && console.timeEnd("onCompletion");
 		return [];
