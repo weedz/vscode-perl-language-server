@@ -1,6 +1,5 @@
 # Perl language server for vscode
 
-[![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/weedz/vscode-perl-language-server?include_prereleases&style=for-the-badge)](https://github.com/weedz/vscode-perl-language-server/releases)
 [![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/linus-bjorklund.perl-lsp?style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=linus-bjorklund.perl-lsp)
 
 Performs a really basic static analyze of perl code to provide the following:
@@ -20,7 +19,11 @@ I will not parse perl in any way so this is unfortunately a limitation of the cu
 
 ## Installation
 
-Prepackaged vscode extension is available from the [releases](https://github.com/weedz/vscode-perl-language-server/releases)
+Available from the [VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=linus-bjorklund.perl-lsp).
+
+or
+
+Prepackaged vscode extension is available from the [releases](https://github.com/weedz/vscode-perl-language-server/releases).
 
 Download and then open the command palatte in vscode and search for "Extension: Install from VSIX..." and select the downloaded file.
 
