@@ -1,13 +1,12 @@
 {
-	"name": "lsp-sample-client",
-	"description": "VSCode part of a language server",
-	"author": "Microsoft Corporation",
+	"name": "perl-lsp-client",
+	"version": "1.0.0",
+	"author": "Linus Björklund",
 	"license": "MIT",
-	"version": "0.0.1",
-	"publisher": "vscode",
+	"publisher": "weedzcokie",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-extension-samples"
+		"url": "https://github.com/weedz/vscode-perl-language-server"
 	},
 	"engines": {
 		"vscode": "^1.63.0"
@@ -16,7 +15,6 @@
 		"vscode-languageclient": "^7.0.0"
 	},
 	"devDependencies": {
-		"@types/vscode": "^1.63.0",
-		"@vscode/test-electron": "^2.1.2"
+		"@types/vscode": "^1.63.0"
 	}
 }

@@ -32,6 +32,9 @@ import {
 import * as fs from "fs/promises";
 import * as path from "path";
 
+const DEBUG_MEASURE_TIME = false;
+const DEBUG_MEASURE_SINGLE_FILE = false;
+
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 const connection = createConnection(ProposedFeatures.all);
@@ -42,8 +45,6 @@ const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = true;
 let hasDiagnosticRelatedInformationCapability = false;
-const DEBUG_MEASURE_TIME = false;
-const DEBUG_MEASURE_SINGLE_FILE = false;
 
 let activeWorkspaceRoot: string;
 

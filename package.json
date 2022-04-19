@@ -47,8 +47,9 @@
 	],
 	"scripts": {
 		"lint": "eslint ./client/src ./server/src --ext .ts,.tsx",
-		"vscode:prepublish": "npm run esbuild-base -- --minify",
+		"vscode:prepublish": "npm run esbuild-base && npm run terser",
 		"esbuild-base": "esbuild extension=./client/src/extension.ts server=./server/src/server.ts --bundle --outdir=out --external:vscode --format=cjs --platform=node",
+		"terser": "terser out/extension.js --compress --mangle --module --output=out/extension.js && terser out/server.js --compress --mangle --module --output=out/server.js",
 		"esbuild": "npm run esbuild-base -- --sourcemap",
 		"esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
 		"test-compile": "tsc -p ./"
@@ -59,6 +60,7 @@
 		"@typescript-eslint/parser": "^5.13.0",
 		"esbuild": "^0.14.36",
 		"eslint": "^8.10.0",
+		"terser": "^5.12.1",
 		"typescript": "^4.6.2"
 	}
 }
