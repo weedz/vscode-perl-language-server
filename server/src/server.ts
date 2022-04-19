@@ -171,7 +171,7 @@ connection.onDocumentSymbol((symbolParams): DocumentSymbol[] => {
 		return {
 			kind: SymbolKind.Function,
 			name: functionName,
-			detail: f.slice(0, seperatorPosition),
+			detail: f,
 			range: {
 				start: {
 					line: position.line - 1,
