@@ -301,40 +301,54 @@ function getTargetLineInDocument(textDocument: TextDocumentIdentifier, position:
 	});
 }
 
+function getIdentifierNameFromLine(line: string, position: Position) {
+	const prefix = line.substring(0, position.character);
+	const suffix = line.substring(position.character).trimEnd();
+
+	const prefixRegExp = prefix.match(/[^a-zA-Z0-9_:]?([a-zA-Z0-9_:]+)$/);
+	const prefixMatch = prefixRegExp?.[1] || prefix;
+	const suffixMatch = suffix.search(/[^a-zA-Z0-9_]/);
+
+	const identifier = prefixMatch.concat(suffixMatch !== -1 ? suffix.substring(0, suffixMatch) : suffix);
+
+	return {
+		startIndex: prefixRegExp && prefixRegExp.index ? prefixRegExp.index + 1 : 0,
+		endIndex: suffixMatch !== -1 ? suffixMatch : line.length,
+		line,
+		identifier,
+	};
+}
 function getIdentifierNameAtPosition(textDocument: TextDocumentIdentifier, position: Position) {
 	const currentLine = getTargetLineInDocument(textDocument, position);
 	if (currentLine === undefined) {
 		return;
 	}
 
-	const prefix = currentLine.substring(0, position.character);
-	const suffix = currentLine.substring(position.character).trimEnd();
-
-	const prefixMatch = prefix.match(/[^a-zA-Z0-9_:]?([a-zA-Z0-9_:]+)$/)?.[1] || prefix;
-	const suffixMatch = suffix.search(/[^a-zA-Z0-9_]/);
-
-	const identifier = prefixMatch.concat(suffixMatch !== -1 ? suffix.substring(0, suffixMatch) : suffix);
-
-	return {
-		currentLine,
-		identifier,
-	};
-
+	return getIdentifierNameFromLine(currentLine, position);
 }
 
 connection.onDefinition((definition) => {
 	DEBUG_MEASURE_TIME && console.time("onDefinition()");
 
 	const word = getIdentifierNameAtPosition(definition.textDocument, definition.position);
-	const identifier = word?.identifier;
-	if (!identifier) {
+	if (!word?.identifier) {
 		DEBUG_MEASURE_TIME && console.timeEnd("onDefinition()");
 		return [];
 	}
+	let identifier = word.identifier;
 
-	// TODO:  Resolve something like Obj::A->new() to Obj::A::new
-
+	
 	const definitions: DefinitionLink[] = [];
+	
+	// Resolve something like Obj::A->new() to Obj::A::new
+	if (!identifier.includes("::")) {
+		if (word.line.substring(word.startIndex - 2, word.startIndex) === "->") {
+			const instance = getIdentifierNameFromLine(word.line, { line: 0, character: word.startIndex - 2 });
+			if (PACKAGES[instance.identifier]) {
+				identifier = `${instance.identifier}::${identifier}`;
+			}
+		}
+	}
 
 	if (!identifier.includes("::")) {
 		// Find package scoped functions
@@ -509,7 +523,7 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 
 	const word = getIdentifierNameAtPosition(textDocumentPosition.textDocument, textDocumentPosition.position);
 	const identifier = word?.identifier;
-	if (identifier === undefined || word?.currentLine.startsWith("sub ")) {
+	if (identifier === undefined || word?.line.startsWith("sub ")) {
 		DEBUG_MEASURE_TIME && console.timeEnd("onCompletion");
 		return [];
 	}
