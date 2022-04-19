@@ -298,7 +298,7 @@ function getTargetLineInDocument(textDocument: TextDocumentIdentifier, position:
 			line: position.line + 1,
 			character: 0,
 		}
-	}).trimEnd();
+	});
 }
 
 function getIdentifierNameAtPosition(textDocument: TextDocumentIdentifier, position: Position) {
@@ -308,19 +308,26 @@ function getIdentifierNameAtPosition(textDocument: TextDocumentIdentifier, posit
 	}
 
 	const prefix = currentLine.substring(0, position.character);
-	const suffix = currentLine.substring(position.character);
+	const suffix = currentLine.substring(position.character).trimEnd();
 
 	const prefixMatch = prefix.match(/[^a-zA-Z0-9_:]?([a-zA-Z0-9_:]+)$/)?.[1] || prefix;
 	const suffixMatch = suffix.search(/[^a-zA-Z0-9_]/);
 
-	return prefixMatch.concat(suffixMatch !== -1 ? suffix.substring(0, suffixMatch) : suffix);
+	const identifier = prefixMatch.concat(suffixMatch !== -1 ? suffix.substring(0, suffixMatch) : suffix);
+
+	return {
+		currentLine,
+		identifier,
+	};
+
 }
 
 connection.onDefinition((definition) => {
 	DEBUG_MEASURE_TIME && console.time("onDefinition()");
 
 	const word = getIdentifierNameAtPosition(definition.textDocument, definition.position);
-	if (!word) {
+	const identifier = word?.identifier;
+	if (!identifier) {
 		DEBUG_MEASURE_TIME && console.timeEnd("onDefinition()");
 		return [];
 	}
@@ -329,11 +336,11 @@ connection.onDefinition((definition) => {
 
 	const definitions: DefinitionLink[] = [];
 
-	if (!word.includes("::")) {
+	if (!identifier.includes("::")) {
 		// Find package scoped functions
 		const filePackage = FILES[definition.textDocument.uri];
 		for (const p of filePackage.packages) {
-			const funcs = FUNCTIONS[`${p.packageName}::${word}`] || [];
+			const funcs = FUNCTIONS[`${p.packageName}::${identifier}`] || [];
 			for (const f of funcs.filter(f => f.file === definition.textDocument.uri)) {
 				definitions.push({
 					targetUri: definition.textDocument.uri,
@@ -344,7 +351,7 @@ connection.onDefinition((definition) => {
 						},
 						end: {
 							line: f.line - 1,
-							character: word.length + 4
+							character: identifier.length + 4
 						}
 					},
 					targetSelectionRange: {
@@ -354,15 +361,15 @@ connection.onDefinition((definition) => {
 						},
 						end: {
 							line: f.line - 1,
-							character: word.length + 4
+							character: identifier.length + 4
 						}
 					},
 				});
 			}
 		}
 	}
-	if (FUNCTIONS[word]) {
-		for (const f of FUNCTIONS[word]) {
+	if (FUNCTIONS[identifier]) {
+		for (const f of FUNCTIONS[identifier]) {
 			definitions.push({
 				targetUri: f.file,
 				targetRange: {
@@ -372,7 +379,7 @@ connection.onDefinition((definition) => {
 					},
 					end: {
 						line: f.line - 1,
-						character: word.length + 4
+						character: identifier.length + 4
 					}
 				},
 				targetSelectionRange: {
@@ -382,16 +389,16 @@ connection.onDefinition((definition) => {
 					},
 					end: {
 						line: f.line - 1,
-						character: word.length + 4
+						character: identifier.length + 4
 					}
 				},
 			});
 		}
 	} else {
 		// Lookup package
-		if (PACKAGES[word]) {
-			for (const location of PACKAGES[word].locations) {
-				for (const p of FILES[location.file].packages.filter(p => p.packageName === word)) {
+		if (PACKAGES[identifier]) {
+			for (const location of PACKAGES[identifier].locations) {
+				for (const p of FILES[location.file].packages.filter(p => p.packageName === identifier)) {
 					definitions.push({
 						targetUri: location.file,
 						targetRange: {
@@ -401,7 +408,7 @@ connection.onDefinition((definition) => {
 							},
 							end: {
 								line: p.line - 1,
-								character: word.length + 8
+								character: identifier.length + 8
 							}
 						},
 						targetSelectionRange: {
@@ -411,7 +418,7 @@ connection.onDefinition((definition) => {
 							},
 							end: {
 								line: p.line - 1,
-								character: word.length + 8
+								character: identifier.length + 8
 							}
 						},
 					});
@@ -422,7 +429,7 @@ connection.onDefinition((definition) => {
 
 	if (!definitions.length) {
 		for (const [f, locations] of Object.entries(FUNCTIONS)) {
-			if (f.endsWith(word)) {
+			if (f.endsWith(identifier)) {
 				definitions.push(...locations.map(position => ({
 					targetUri: position.file,
 					targetRange: {
@@ -501,7 +508,8 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 	DEBUG_MEASURE_TIME && console.time("onCompletion");
 
 	const word = getIdentifierNameAtPosition(textDocumentPosition.textDocument, textDocumentPosition.position);
-	if (word === undefined) {
+	const identifier = word?.identifier;
+	if (identifier === undefined || word?.currentLine.startsWith("sub ")) {
 		DEBUG_MEASURE_TIME && console.timeEnd("onCompletion");
 		return [];
 	}
@@ -511,8 +519,8 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 	let packages: CompletionItem[] = [];
 	const functions: CompletionItem[] = [];
 
-	if (word.includes("::")) {
-		const packageName = word.slice(0, word.lastIndexOf("::"));
+	if (identifier.includes("::")) {
+		const packageName = identifier.slice(0, identifier.lastIndexOf("::"));
 		if (PACKAGES[packageName]) {
 			const flatPackageTree = getFlatPackageTree(packageName).filter(p => p !== packageName);
 			packages = flatPackageTree.map(p => ({
