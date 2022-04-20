@@ -48,6 +48,24 @@ let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = true;
 // let hasDiagnosticRelatedInformationCapability = false;
 
+
+// The example settings
+interface ExampleSettings {
+	maxNumberOfProblems: number;
+	ignoreFolders: string[];
+}
+
+// The global settings, used when the `workspace/configuration` request is not supported by the client.
+// Please note that this is not the case when using this server with the client provided in this example
+// but could happen with other clients.
+const defaultSettings: ExampleSettings = { maxNumberOfProblems: 1000, ignoreFolders: [] };
+let globalSettings: ExampleSettings = defaultSettings;
+
+// Cache the settings of all open documents, but we only need one global settings object.
+const documentSettings: Map<string, Thenable<ExampleSettings>> = new Map();
+let IGNORED_FOLDERS: ExampleSettings["ignoreFolders"] = [];
+
+
 let activeWorkspaceRoot: string;
 
 connection.onInitialize(async (params: InitializeParams) => {
@@ -115,43 +133,31 @@ connection.onInitialized(async _ => {
 	const settings = await getDocumentSettings("global");
 	IGNORED_FOLDERS = settings.ignoreFolders;
 
-	// This solves renamed/deleted folders not emiting filewatch events
-	watcher = watch("**/*.{pl,pm,fcgi}", {
-		cwd: activeWorkspaceRoot,
-		ignored: IGNORED_FOLDERS,
-		persistent: true
-	});
-	watcher.on("unlink", filePath => {
-		clearDefinitions(`file://${activeWorkspaceRoot}/${filePath}`);
-	});
-	watcher.on("add", filePath => {
-		clearDefinitions(`file://${activeWorkspaceRoot}/${filePath}`);
-		fs.readFile(`${activeWorkspaceRoot}/${filePath}`).then(content => {
-			readSingleFile(`file://${activeWorkspaceRoot}/${filePath}`, content.toString());
+	// Only run file watcher for workspace folders
+	if (activeWorkspaceRoot) {
+		// This solves renamed/deleted folders not emiting filewatch events
+		watcher = watch("**/*.{pl,pm,fcgi}", {
+			cwd: activeWorkspaceRoot,
+			ignored: IGNORED_FOLDERS,
+			persistent: true
 		});
-	});
-	watcher.on("change", (filePath, _stats) => {
-		clearDefinitions(`file://${activeWorkspaceRoot}/${filePath}`);
-		fs.readFile(`${activeWorkspaceRoot}/${filePath}`).then(content => {
-			readSingleFile(`file://${activeWorkspaceRoot}/${filePath}`, content.toString());
+		watcher.on("unlink", filePath => {
+			clearDefinitions(`file://${activeWorkspaceRoot}/${filePath}`);
 		});
-	});
+		watcher.on("add", filePath => {
+			clearDefinitions(`file://${activeWorkspaceRoot}/${filePath}`);
+			fs.readFile(`${activeWorkspaceRoot}/${filePath}`).then(content => {
+				readSingleFile(`file://${activeWorkspaceRoot}/${filePath}`, content.toString());
+			});
+		});
+		watcher.on("change", (filePath, _stats) => {
+			clearDefinitions(`file://${activeWorkspaceRoot}/${filePath}`);
+			fs.readFile(`${activeWorkspaceRoot}/${filePath}`).then(content => {
+				readSingleFile(`file://${activeWorkspaceRoot}/${filePath}`, content.toString());
+			});
+		});
+	}
 });
-
-// The example settings
-interface ExampleSettings {
-	maxNumberOfProblems: number;
-	ignoreFolders: string[];
-}
-
-// The global settings, used when the `workspace/configuration` request is not supported by the client.
-// Please note that this is not the case when using this server with the client provided in this example
-// but could happen with other clients.
-const defaultSettings: ExampleSettings = { maxNumberOfProblems: 1000, ignoreFolders: [] };
-let globalSettings: ExampleSettings = defaultSettings;
-
-// Cache the settings of all open documents, but we only need one global settings object.
-const documentSettings: Map<string, Thenable<ExampleSettings>> = new Map();
 
 connection.onDidChangeConfiguration(async change => {
 	if (hasConfigurationCapability) {
@@ -624,7 +630,6 @@ connection.onShutdown(() => {
 const defs = {
 	function: /^\s*sub\s+([a-zA-Z0-9_]+)/,
 	package: /^package\s+([a-zA-Z0-9:_]+);/m,
-	file: /[.](pl|pm|fcgi)$/i,
 };
 
 function processContent(documentURI: string, content: string) {
@@ -818,51 +823,4 @@ function clearDefinitions(documentURI: string) {
 	
 	// And lastly delete the FILES reference to this file.
 	delete FILES[documentURI];
-}
-
-function isValidFile(fileName: string) {
-	return defs.file.test(fileName);
-}
-
-let IGNORED_FOLDERS: ExampleSettings["ignoreFolders"] = [];
-
-function isValidDirectory(fullPath: string) {
-	const basename = path.basename(fullPath);
-	if (basename === "." || basename === "..") {
-		return false;
-	}
-
-	for (let folder of IGNORED_FOLDERS) {
-		if (folder.startsWith("/")) {
-			folder = `${activeWorkspaceRoot}${folder}`;
-		}
-		if (fullPath.includes(folder)) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-// NOTE: `fullPath` must be without `file://` protocol
-async function readWorkspaceFolder(fullPath: string) {
-	const files = await fs.readdir(fullPath);
-
-	const promises: Promise<void>[] = [];
-
-	for (const file of files) {
-		const currentFile = path.join(fullPath, file);
-		if (isValidFile(file)) {
-			promises.push(fs.readFile(currentFile).then(content => {
-				readSingleFile(`file://${currentFile}`, content.toString());
-			}));
-		} else {
-			const stats = await fs.stat(currentFile);
-			if (stats.isDirectory() && isValidDirectory(currentFile)) {
-				promises.push(readWorkspaceFolder(currentFile));
-			}
-		}
-	}
-
-	await Promise.all(promises);
 }
