@@ -13,4 +13,3 @@ test_perl_workspace
 node_modules/
 .eslintignore
 .swcrc
-PLAN.md
