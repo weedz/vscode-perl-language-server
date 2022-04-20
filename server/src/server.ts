@@ -397,86 +397,20 @@ connection.onDefinition((definition) => {
 		for (const p of filePackage.packages) {
 			const funcs = FUNCTIONS[`${p.packageName}::${identifier}`] || [];
 			for (const f of funcs.filter(f => f.file === definition.textDocument.uri)) {
-				definitions.push({
-					targetUri: definition.textDocument.uri,
-					targetRange: {
-						start: {
-							line: f.line - 1,
-							character: 0
-						},
-						end: {
-							line: f.line - 1,
-							character: identifier.length + 4
-						}
-					},
-					targetSelectionRange: {
-						start: {
-							line: f.line - 1,
-							character: 0
-						},
-						end: {
-							line: f.line - 1,
-							character: identifier.length + 4
-						}
-					},
-				});
+				definitions.push(createDefinition(identifier, f, 4));
 			}
 		}
 	}
 	if (FUNCTIONS[identifier]) {
 		for (const f of FUNCTIONS[identifier]) {
-			definitions.push({
-				targetUri: f.file,
-				targetRange: {
-					start: {
-						line: f.line - 1,
-						character: 0
-					},
-					end: {
-						line: f.line - 1,
-						character: identifier.length + 4
-					}
-				},
-				targetSelectionRange: {
-					start: {
-						line: f.line - 1,
-						character: 0
-					},
-					end: {
-						line: f.line - 1,
-						character: identifier.length + 4
-					}
-				},
-			});
+			definitions.push(createDefinition(identifier, f, 4));
 		}
 	} else {
 		// Lookup package
 		if (PACKAGES[identifier]) {
 			for (const location of PACKAGES[identifier].locations) {
 				for (const p of FILES[location.file].packages.filter(p => p.packageName === identifier)) {
-					definitions.push({
-						targetUri: location.file,
-						targetRange: {
-							start: {
-								line: p.line - 1,
-								character: 0
-							},
-							end: {
-								line: p.line - 1,
-								character: identifier.length + 8
-							}
-						},
-						targetSelectionRange: {
-							start: {
-								line: p.line - 1,
-								character: 0
-							},
-							end: {
-								line: p.line - 1,
-								character: identifier.length + 8
-							}
-						},
-					});
+					definitions.push(createDefinition(identifier, location, 8));
 				}
 			}
 		}
@@ -485,29 +419,7 @@ connection.onDefinition((definition) => {
 	if (!definitions.length) {
 		for (const [f, locations] of Object.entries(FUNCTIONS)) {
 			if (f.endsWith(identifier)) {
-				definitions.push(...locations.map(position => ({
-					targetUri: position.file,
-					targetRange: {
-						start: {
-							line: position.line - 1,
-							character: 0
-						},
-						end: {
-							line: position.line - 1,
-							character: f.length + 4
-						}
-					},
-					targetSelectionRange: {
-						start: {
-							line: position.line - 1,
-							character: 0
-						},
-						end: {
-							line: position.line - 1,
-							character: f.length + 4
-						}
-					},
-				})));
+				definitions.push(...locations.map(position => createDefinition(f, position, 4)));
 			}
 		}
 	}
@@ -516,6 +428,32 @@ connection.onDefinition((definition) => {
 
 	return definitions;
 });
+
+function createDefinition(definitionName: string, location: Location, prefixLength: number) {
+	return {
+		targetUri: location.file,
+		targetRange: {
+			start: {
+				line: location.line - 1,
+				character: 0
+			},
+			end: {
+				line: location.line - 1,
+				character: definitionName.length + prefixLength
+			}
+		},
+		targetSelectionRange: {
+			start: {
+				line: location.line - 1,
+				character: 0
+			},
+			end: {
+				line: location.line - 1,
+				character: definitionName.length + prefixLength
+			}
+		},
+	};
+}
 
 
 function objectIsEmpty(obj: any) {
@@ -598,21 +536,6 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 
 	return functions.concat(packages);
 });
-
-// This handler resolves additional information for the item selected in
-// the completion list.
-// connection.onCompletionResolve(
-// 	(item: CompletionItem): CompletionItem => {
-// 		if (item.data === 1) {
-// 			item.detail = 'TypeScript details';
-// 			item.documentation = 'TypeScript documentation';
-// 		} else if (item.data === 2) {
-// 			item.detail = 'JavaScript details';
-// 			item.documentation = 'JavaScript documentation';
-// 		}
-// 		return item;
-// 	}
-// );
 
 // Make the text document manager listen on the connection
 // for open, change and close text document events
@@ -744,12 +667,14 @@ function readSingleFile(fullPath: string, fileContent: string) {
 	DEBUG_MEASURE_TIME && DEBUG_MEASURE_SINGLE_FILE && console.timeEnd(`process: ${fullPath}`);
 }
 
+interface Location {
+	file: string
+	line: number
+}
+
 interface Packages {
 	[packageName: string]: {
-		locations: Array<{
-			file: string
-			line: number
-		}>
+		locations: Location[]
 		packages: {
 			[packageName: string]: number
 		}
@@ -758,10 +683,7 @@ interface Packages {
 }
 
 interface Functions {
-	[packageAndFunction: string]: Array<{
-		file: string
-		line: number
-	}>
+	[packageAndFunction: string]: Location[]
 }
 
 interface Files {
