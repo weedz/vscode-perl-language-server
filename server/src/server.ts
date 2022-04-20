@@ -582,7 +582,8 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 		for (const p of FILES[documentURI].packages) {
 			for (const f of PACKAGES[p.packageName].functions) {
 				functions.push({
-					label: `${p.packageName}::${f}`,
+					label: f,
+					detail: `${p.packageName}::${f}`,
 					kind: CompletionItemKind.Function,
 				});
 			}
