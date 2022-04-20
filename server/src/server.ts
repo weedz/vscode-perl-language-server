@@ -801,6 +801,10 @@ function clearDefinitions(documentURI: string) {
 		// Remove references to all functions defined in this file
 		for (const f of PACKAGES[packageName].functions) {
 			const funcFullName = `${packageName}::${f}`;
+			if (!FUNCTIONS[funcFullName]) {
+				// FIXME: Should probably look into why this happens
+				continue;
+			}
 	
 			FUNCTIONS[funcFullName].splice(FUNCTIONS[funcFullName].findIndex(f => f.file === documentURI)>>>0, 1);
 	
