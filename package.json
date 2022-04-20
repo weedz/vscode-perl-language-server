@@ -54,7 +54,7 @@
 		"server"
 	],
 	"scripts": {
-		"lint": "eslint ./client/src ./server/src --ext .ts,.tsx",
+		"lint": "eslint ./client/src ./server/src --ext .ts,.tsx && tsc --noEmit",
 		"vscode:prepublish": "npm run esbuild-base && npm run swc",
 		"esbuild-base": "esbuild extension=./client/src/extension.ts server=./server/src/server.ts --bundle --outdir=out --external:vscode --external:fsevents --format=cjs --platform=node",
 		"swc": "swc out/extension.js out/server.js -d out",

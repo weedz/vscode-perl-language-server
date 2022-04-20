@@ -5,6 +5,7 @@
 		"lib": ["ES2021"],
 		"outDir": "out",
 		"sourceMap": true,
+		"moduleResolution": "node",
 		"strict": true
 	},
 	"exclude": [
