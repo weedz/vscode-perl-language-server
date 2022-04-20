@@ -1,0 +1,17 @@
+{
+    // Enable minification
+    "minify": true,
+    // Optional, configure minifcation options
+    "jsc": {
+        "target": "es2022",
+        "parser": {
+            "syntax": "ecmascript",
+            "jsx": false
+        },
+        "minify": {
+            "compress": true,
+            "mangle": true
+        }
+    },
+    "sourceMaps": false
+}

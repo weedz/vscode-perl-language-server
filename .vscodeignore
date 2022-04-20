@@ -7,8 +7,10 @@
 **/tsconfig.base.json
 contributing.md
 .travis.yml
-client/out/test/**
+client/**
+server/**
 test_perl_workspace
 node_modules/
 .eslintignore
+.swcrc
 PLAN.md
