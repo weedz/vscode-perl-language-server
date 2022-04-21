@@ -121,17 +121,15 @@ connection.onInitialized(async _ => {
 		watcher.on("unlink", filePath => {
 			clearDefinitions(`${activeWorkspaceRoot}/${filePath}`);
 		});
-		watcher.on("add", filePath => {
+		watcher.on("add", async filePath => {
 			clearDefinitions(`${activeWorkspaceRoot}/${filePath}`);
-			fs.readFile(new URL(`${activeWorkspaceRoot}/${filePath}`)).then(content => {
-				readSingleFile(`${activeWorkspaceRoot}/${filePath}`, content.toString());
-			});
+			const content = await fs.readFile(new URL(`${activeWorkspaceRoot}/${filePath}`));
+			readSingleFile(`${activeWorkspaceRoot}/${filePath}`, content.toString());
 		});
-		watcher.on("change", (filePath, _stats) => {
+		watcher.on("change", async (filePath, _stats) => {
 			clearDefinitions(`${activeWorkspaceRoot}/${filePath}`);
-			fs.readFile(new URL(`${activeWorkspaceRoot}/${filePath}`)).then(content => {
-				readSingleFile(`${activeWorkspaceRoot}/${filePath}`, content.toString());
-			});
+			const content = await fs.readFile(new URL(`${activeWorkspaceRoot}/${filePath}`));
+			readSingleFile(`${activeWorkspaceRoot}/${filePath}`, content.toString());
 		});
 	}
 });
