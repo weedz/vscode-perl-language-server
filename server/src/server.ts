@@ -14,7 +14,7 @@ import {
 import * as fs from "fs/promises";
 import { watch, FSWatcher } from "chokidar";
 import { clearDefinitions, onCompletion, onDefinition, onDocumentSymbol, onWorkspaceSymbol, readSingleFile } from './Perl';
-import { documentsListen, getDocuments } from './config';
+import { DEBUG_MEASURE_SINGLE_FILE, DEBUG_MEASURE_TIME, documentsListen, getDocuments } from './config';
 
 let watcher: FSWatcher;
 
@@ -122,12 +122,10 @@ connection.onInitialized(async _ => {
 			clearDefinitions(`${activeWorkspaceRoot}/${filePath}`);
 		});
 		watcher.on("add", async filePath => {
-			clearDefinitions(`${activeWorkspaceRoot}/${filePath}`);
 			const content = await fs.readFile(new URL(`${activeWorkspaceRoot}/${filePath}`));
 			readSingleFile(`${activeWorkspaceRoot}/${filePath}`, content.toString());
 		});
 		watcher.on("change", async (filePath, _stats) => {
-			clearDefinitions(`${activeWorkspaceRoot}/${filePath}`);
 			const content = await fs.readFile(new URL(`${activeWorkspaceRoot}/${filePath}`));
 			readSingleFile(`${activeWorkspaceRoot}/${filePath}`, content.toString());
 		});
@@ -166,12 +164,11 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
 getDocuments().onDidChangeContent(change => {
-	clearDefinitions(change.document.uri);
 	readSingleFile(change.document.uri, change.document.getText());
 });
 getDocuments().onDidClose(change => {
-	if (!change.document.uri.startsWith(activeWorkspaceRoot)) {
-		// Clear definitions for files outside of active workspace when closed
+	// Clear definitions for files outside of active workspace when closed
+	if (!activeWorkspaceRoot || !change.document.uri.startsWith(activeWorkspaceRoot)) {
 		clearDefinitions(change.document.uri);
 	}
 });

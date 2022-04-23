@@ -47,11 +47,11 @@ const FILES: Files = {};
 
 
 export function onDocumentSymbol(symbolParams: DocumentSymbolParams): DocumentSymbol[] {
-	DEBUG_MEASURE_TIME && console.time("onDocumentSymbol()");
-
 	const documentURI = symbolParams.textDocument.uri;
+	DEBUG_MEASURE_TIME && console.time(`onDocumentSymbol(): ${documentURI}`);
+
 	if (!FILES[documentURI]) {
-		DEBUG_MEASURE_TIME && console.timeEnd("onDocumentSymbol()");
+		DEBUG_MEASURE_TIME && console.timeEnd(`onDocumentSymbol(): ${documentURI}`);
 		return [];
 	}
 
@@ -104,17 +104,17 @@ export function onDocumentSymbol(symbolParams: DocumentSymbolParams): DocumentSy
 		});
 	}
 
-	DEBUG_MEASURE_TIME && console.timeEnd("onDocumentSymbol()");
+	DEBUG_MEASURE_TIME && console.timeEnd(`onDocumentSymbol(): ${documentURI}`);
 
 	return symbols;
 }
 
 export function onWorkspaceSymbol(symbolParams: WorkspaceSymbolParams): SymbolInformation[] {
-	DEBUG_MEASURE_TIME && console.time("workspace-symbols");
-
 	const query = symbolParams.query.toLowerCase();
+	DEBUG_MEASURE_TIME && console.time(`onWorkspaceSymbol(): ${query}`);
+
 	if (query.length === 0) {
-		DEBUG_MEASURE_TIME && console.timeEnd("workspace-symbols");
+		DEBUG_MEASURE_TIME && console.timeEnd(`onWorkspaceSymbol(): ${query}`);
 		return [];
 	}
 
@@ -170,7 +170,7 @@ export function onWorkspaceSymbol(symbolParams: WorkspaceSymbolParams): SymbolIn
 		}
 	}
 
-	DEBUG_MEASURE_TIME && console.timeEnd("workspace-symbols");
+	DEBUG_MEASURE_TIME && console.timeEnd(`onWorkspaceSymbol(): ${query}`);
 	return symbols;
 }
 
@@ -389,7 +389,7 @@ function getIdentifierNameAtPosition(textDocument: TextDocumentIdentifier, posit
 
 const defs = {
 	function: /^\s*sub\s+([a-zA-Z0-9_]+)/,
-	package: /^package\s+([a-zA-Z0-9:_]+);/m,
+	package: /^package\s+([a-zA-Z0-9:_]+);/,
 };
 
 function processContent(documentURI: string, content: string) {
@@ -419,8 +419,8 @@ function processContent(documentURI: string, content: string) {
 			const packageTree = packageName.split("::");
 
 			// Set all PACKAGES for packageTree and PACKAGES[0].packages
-			for (let i = 0; i < packageTree.length; ++i) {
-				const fullPackageTree = packageTree.slice(0, i+1).join("::");
+			for (let j = 0; j < packageTree.length; ++j) {
+				const fullPackageTree = packageTree.slice(0, j+1).join("::");
 
 				if (!PACKAGES[fullPackageTree]) {
 					PACKAGES[fullPackageTree] = {
@@ -430,12 +430,12 @@ function processContent(documentURI: string, content: string) {
 					};
 				}
 			
-				if (i < packageTree.length - 1) {
+				if (j < packageTree.length - 1) {
 					// FIXME: This is not the nicest thing i've seen...
-					if (PACKAGES[fullPackageTree].packages[packageTree[i+1]]) {
-						PACKAGES[fullPackageTree].packages[packageTree[i+1]]++;
+					if (PACKAGES[fullPackageTree].packages[packageTree[j+1]]) {
+						PACKAGES[fullPackageTree].packages[packageTree[j+1]]++;
 					} else {
-						PACKAGES[fullPackageTree].packages[packageTree[i+1]] = 1;
+						PACKAGES[fullPackageTree].packages[packageTree[j+1]] = 1;
 					}
 				}
 			}
@@ -496,16 +496,33 @@ function processContent(documentURI: string, content: string) {
 	};
 }
 
+const debounceFileProcess: Record<string, NodeJS.Timeout> = {};
+
+function clearAndProcessDefinitions(documentURI: string, fileContent: string) {
+	DEBUG_MEASURE_TIME && DEBUG_MEASURE_SINGLE_FILE && console.time(`readSingleFile: ${documentURI}`);
+	clearDefinitions(documentURI);
+	processContent(documentURI, fileContent);
+	DEBUG_MEASURE_TIME && DEBUG_MEASURE_SINGLE_FILE && console.timeEnd(`readSingleFile: ${documentURI}`);
+}
+
 // TODO: Move this to a Worker thread?
-export function readSingleFile(fullPath: string, fileContent: string) {
-	DEBUG_MEASURE_TIME && DEBUG_MEASURE_SINGLE_FILE && console.time(`process: ${fullPath}`);
-	processContent(fullPath, fileContent);
-	DEBUG_MEASURE_TIME && DEBUG_MEASURE_SINGLE_FILE && console.timeEnd(`process: ${fullPath}`);
+export function readSingleFile(documentURI: string, fileContent: string) {
+	if (!debounceFileProcess[documentURI]) {
+		clearAndProcessDefinitions(documentURI, fileContent);
+	} else {
+		clearTimeout(debounceFileProcess[documentURI]);
+		debounceFileProcess[documentURI] = setTimeout(() => {
+			clearAndProcessDefinitions(documentURI, fileContent);
+			delete debounceFileProcess[documentURI];
+		}, 200);
+	}
 }
 
 export function clearDefinitions(documentURI: string) {
+	DEBUG_MEASURE_TIME && console.time(`clearDefinitions(): ${documentURI}`);
 	const file = FILES[documentURI];
 	if (!file) {
+		DEBUG_MEASURE_TIME && console.timeEnd(`clearDefinitions(): ${documentURI}`);
 		return;
 	}
 
@@ -542,4 +559,6 @@ export function clearDefinitions(documentURI: string) {
 	
 	// And lastly delete the FILES reference to this file.
 	delete FILES[documentURI];
+
+	DEBUG_MEASURE_TIME && console.timeEnd(`clearDefinitions(): ${documentURI}`);
 }
