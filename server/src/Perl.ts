@@ -390,6 +390,7 @@ function getIdentifierNameAtPosition(textDocument: TextDocumentIdentifier, posit
 const defs = {
 	function: /^\s*sub\s+([a-zA-Z0-9_]+)/,
 	package: /^package\s+([a-zA-Z0-9:_]+);/,
+	file: /[.](?:pm|pl|fcgi)$/,
 };
 
 function processContent(documentURI: string, content: string) {
@@ -561,4 +562,8 @@ export function clearDefinitions(documentURI: string) {
 	delete FILES[documentURI];
 
 	DEBUG_MEASURE_TIME && console.timeEnd(`clearDefinitions(): ${documentURI}`);
+}
+
+export function validPerlFile(filePath: string) {
+	return defs.file.test(filePath);
 }

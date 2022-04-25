@@ -13,7 +13,7 @@ import {
 
 import * as fs from "fs/promises";
 import { watch, FSWatcher } from "chokidar";
-import { clearDefinitions, onCompletion, onDefinition, onDocumentSymbol, onWorkspaceSymbol, readSingleFile } from './Perl';
+import { clearDefinitions, onCompletion, onDefinition, onDocumentSymbol, onWorkspaceSymbol, readSingleFile, validPerlFile } from './Perl';
 import { DEBUG_MEASURE_SINGLE_FILE, DEBUG_MEASURE_TIME, documentsListen, getDocuments } from './config';
 
 let watcher: FSWatcher;
@@ -114,18 +114,27 @@ connection.onInitialized(async _ => {
 	// Only run file watcher for workspace folders
 	if (activeWorkspaceRoot) {
 		// This solves renamed/deleted folders not emiting filewatch events
-		watcher = watch("**/*.{pl,pm,fcgi}", {
+		watcher = watch(".", {
 			ignored: IGNORED_FOLDERS,
 			persistent: true
 		});
 		watcher.on("unlink", filePath => {
+			if (!validPerlFile(filePath)) {
+				return;
+			}
 			clearDefinitions(`${activeWorkspaceRoot}/${filePath}`);
 		});
 		watcher.on("add", async filePath => {
+			if (!validPerlFile(filePath)) {
+				return;
+			}
 			const content = await fs.readFile(new URL(`${activeWorkspaceRoot}/${filePath}`));
 			readSingleFile(`${activeWorkspaceRoot}/${filePath}`, content.toString());
 		});
 		watcher.on("change", async (filePath, _stats) => {
+			if (!validPerlFile(filePath)) {
+				return;
+			}
 			const content = await fs.readFile(new URL(`${activeWorkspaceRoot}/${filePath}`));
 			readSingleFile(`${activeWorkspaceRoot}/${filePath}`, content.toString());
 		});
