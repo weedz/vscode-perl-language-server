@@ -55,7 +55,7 @@
 	],
 	"scripts": {
 		"lint": "eslint ./client/src ./server/src --ext .ts,.tsx && tsc --noEmit",
-		"vscode:prepublish": "npm run esbuild-base && npm run swc",
+		"vscode:prepublish": "npm run esbuild-base && npm run swc && mkdir -p out/node_modules && cp -R node_modules/fsevents out/node_modules",
 		"esbuild-base": "esbuild extension=./client/src/extension.ts server=./server/src/server.ts --bundle --outdir=out --external:vscode --external:fsevents --format=cjs --platform=node",
 		"swc": "swc out/extension.js out/server.js -d out",
 		"esbuild": "npm run esbuild-base -- --sourcemap",
@@ -70,6 +70,7 @@
 		"@typescript-eslint/parser": "^5.13.0",
 		"esbuild": "^0.14.36",
 		"eslint": "^8.10.0",
+		"fsevents": "^2.3.2",
 		"typescript": "^4.6.2"
 	},
 	"dependencies": {
