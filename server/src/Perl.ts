@@ -122,7 +122,7 @@ export function onDocumentSymbol(symbolParams: DocumentSymbolParams): DocumentSy
 }
 
 export function onWorkspaceSymbol(symbolParams: WorkspaceSymbolParams): SymbolInformation[] {
-	const query = symbolParams.query.toLowerCase();
+	const query = symbolParams.query.toLowerCase().trim();
 	DEBUG_MEASURE_TIME && console.time(`onWorkspaceSymbol(): ${query}`);
 
 	if (query.length === 0) {
@@ -132,28 +132,34 @@ export function onWorkspaceSymbol(symbolParams: WorkspaceSymbolParams): SymbolIn
 
 	const symbols: SymbolInformation[] = [];
 
-	for (const [functionName, positions] of Object.entries(FUNCTIONS)) {
-		if (!functionName.toLowerCase().includes(query)) {
+	const seperatorIndex = query.lastIndexOf("::");
+	const possibleFunction = seperatorIndex !== -1 ? query.slice(seperatorIndex + 2) : query;
+	const packageName = seperatorIndex !== -1 ? query.slice(0, seperatorIndex) : "";
+
+	for (const [functionName, files] of Object.entries(FUNCTION_MAP)) {
+		if (!functionName.toLowerCase().includes(possibleFunction)) {
 			continue;
 		}
-		for (const position of positions) {
-			symbols.push({
-				kind: SymbolKind.Function,
-				name: functionName,
-				location: {
-					uri: position.file,
-					range: {
-						start: {
-							line: position.line - 1,
-							character: 0,
-						},
-						end: {
-							line: position.line,
-							character: 0,
-						},
+		for (const [uri, where] of Object.entries(files)) {
+			if (!packageName || where.package.toLowerCase().includes(packageName)) {
+				symbols.push({
+					kind: SymbolKind.Function,
+					name: `${where.package}::${functionName}`,
+					location: {
+						uri,
+						range: {
+							start: {
+								line: where.location.line - 1,
+								character: 0,
+							},
+							end: {
+								line: where.location.line,
+								character: 0,
+							},
+						}
 					}
-				}
-			});
+				});
+			}
 		}
 	}
 
