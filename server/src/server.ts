@@ -116,7 +116,8 @@ connection.onInitialized(async _ => {
 		// This solves renamed/deleted folders not emiting filewatch events
 		watcher = watch(".", {
 			ignored: IGNORED_FOLDERS,
-			persistent: true
+			persistent: true,
+			useFsEvents: true,
 		});
 		watcher.on("unlink", filePath => {
 			if (!validPerlFile(filePath)) {
@@ -131,7 +132,7 @@ connection.onInitialized(async _ => {
 			const content = await fs.readFile(new URL(`${activeWorkspaceRoot}/${filePath}`));
 			readSingleFile(`${activeWorkspaceRoot}/${filePath}`, content.toString());
 		});
-		watcher.on("change", async (filePath, _stats) => {
+		watcher.on("change", async filePath => {
 			if (!validPerlFile(filePath)) {
 				return;
 			}

@@ -20,6 +20,15 @@ interface Functions {
 	[packageAndFunction: string]: Location[]
 }
 
+interface FunctionMap {
+	[funcName: string]: {
+		[file: string]: {
+			package: string
+			location: Location
+		}
+	}
+}
+
 interface Files {
 	[filePath: string]: {
 		packages: Array<{
@@ -43,6 +52,7 @@ const PACKAGES: Packages = {
 	}
 };
 const FUNCTIONS: Functions = {};
+const FUNCTION_MAP: FunctionMap = {};
 const FILES: Files = {};
 
 
@@ -50,12 +60,14 @@ export function onDocumentSymbol(symbolParams: DocumentSymbolParams): DocumentSy
 	const documentURI = symbolParams.textDocument.uri;
 	DEBUG_MEASURE_TIME && console.time(`onDocumentSymbol(): ${documentURI}`);
 
-	if (!FILES[documentURI]) {
+	const file = FILES[documentURI];
+
+	if (!file) {
 		DEBUG_MEASURE_TIME && console.timeEnd(`onDocumentSymbol(): ${documentURI}`);
 		return [];
 	}
 
-	const symbols: DocumentSymbol[] = Object.entries(FILES[documentURI].functions).map(([f, position]) => {
+	const symbols: DocumentSymbol[] = Object.entries(file.functions).map(([f, position]) => {
 		const seperatorPosition = f.lastIndexOf("::");
 		const functionName = seperatorPosition !== -1 ? f.slice(seperatorPosition + 2) : f;
 		return {
@@ -85,7 +97,7 @@ export function onDocumentSymbol(symbolParams: DocumentSymbolParams): DocumentSy
 		};
 	});
 
-	for (const p of FILES[documentURI].packages) {
+	for (const p of file.packages) {
 		const range = {
 			start: {
 				line: p.line - 1,
@@ -187,46 +199,47 @@ export function onDefinition(definition: DefinitionParams): DefinitionLink[] {
 	
 	const definitions: DefinitionLink[] = [];
 	
-	// Resolve something like Obj::A->new() to Obj::A::new
 	if (!identifier.includes("::")) {
+		// Resolve something like Obj::A->new() to Obj::A::new
 		if (word.line.substring(word.startIndex - 2, word.startIndex) === "->") {
 			const instance = getIdentifierNameFromLine(word.line, { line: 0, character: word.startIndex - 2 });
-			if (PACKAGES[instance.identifier]) {
+			if (instance.identifier in PACKAGES) {
 				identifier = `${instance.identifier}::${identifier}`;
-			}
-		}
-	}
-
-	if (!identifier.includes("::")) {
-		// Find package scoped functions
-		const filePackage = FILES[definition.textDocument.uri];
-		for (const p of filePackage.packages) {
-			const funcs = FUNCTIONS[`${p.packageName}::${identifier}`] || [];
-			for (const f of funcs.filter(f => f.file === definition.textDocument.uri)) {
-				definitions.push(createDefinition(identifier, f, 4));
-			}
-		}
-	}
-	if (FUNCTIONS[identifier]) {
-		for (const f of FUNCTIONS[identifier]) {
-			definitions.push(createDefinition(identifier, f, 4));
-		}
-	} else {
-		// Lookup package
-		if (PACKAGES[identifier]) {
-			for (const location of PACKAGES[identifier].locations) {
-				for (const p of FILES[location.file].packages.filter(p => p.packageName === identifier)) {
-					definitions.push(createDefinition(identifier, location, 8));
+			} else {
+				for (const where of Object.values(FUNCTION_MAP[identifier])) {
+					definitions.push(createDefinition(identifier, where.location, 4));
 				}
 			}
 		}
+
+		// Find functions in this document
+		const filePackage = FILES[definition.textDocument.uri];
+		for (const p of filePackage.packages) {
+			const funcs = FUNCTIONS[`${p.packageName}::${identifier}`] || [];
+			for (const location of funcs.filter(f => f.file === definition.textDocument.uri)) {
+				definitions.push(createDefinition(identifier, location, 4));
+			}
+		}
 	}
 
-	if (!definitions.length) {
-		for (const [f, locations] of Object.entries(FUNCTIONS)) {
-			if (f.endsWith(identifier)) {
-				definitions.push(...locations.map(position => createDefinition(f, position, 4)));
+	if (identifier in FUNCTIONS) {
+		for (const location of FUNCTIONS[identifier]) {
+			definitions.push(createDefinition(identifier, location, 4));
+		}
+	}
+
+	// Lookup package
+	if (identifier in PACKAGES) {
+		for (const location of PACKAGES[identifier].locations) {
+			for (const p of FILES[location.file].packages.filter(p => p.packageName === identifier)) {
+				definitions.push(createDefinition(identifier, location, 8));
 			}
+		}
+	}
+
+	if (!definitions.length && identifier in FUNCTION_MAP) {
+		for (const where of Object.values(FUNCTION_MAP[identifier])) {
+			definitions.push(createDefinition(identifier, where.location, 4));
 		}
 	}
 
@@ -278,7 +291,7 @@ export function onCompletion(textDocumentPosition: TextDocumentPositionParams): 
 
 	if (identifier.includes("::")) {
 		const packageName = identifier.slice(0, identifier.lastIndexOf("::"));
-		if (PACKAGES[packageName]) {
+		if (packageName in PACKAGES) {
 			const flatPackageTree = getFlatPackageTree(packageName).filter(p => p !== packageName);
 			packages = flatPackageTree.map(p => ({
 				label: p,
@@ -423,7 +436,7 @@ function processContent(documentURI: string, content: string) {
 			for (let j = 0; j < packageTree.length; ++j) {
 				const fullPackageTree = packageTree.slice(0, j+1).join("::");
 
-				if (!PACKAGES[fullPackageTree]) {
+				if (!(fullPackageTree in PACKAGES)) {
 					PACKAGES[fullPackageTree] = {
 						locations: [],
 						packages: {},
@@ -461,6 +474,18 @@ function processContent(documentURI: string, content: string) {
 					line: 1
 				});
 			}
+
+			if (!(functionDefinition in FUNCTION_MAP)) {
+				FUNCTION_MAP[functionDefinition] = {};
+			}
+			FUNCTION_MAP[functionDefinition][documentURI] = {
+				package: filePackageName,
+				location: {
+					file: documentURI,
+					line: i + 1
+				}
+			};
+
 			PACKAGES[filePackageName].functions.push(functionDefinition);
 
 			if (lastFunctionName) {
@@ -471,7 +496,7 @@ function processContent(documentURI: string, content: string) {
 
 			lastFunctionName = packageAndFunction;
 
-			if (!FUNCTIONS[packageAndFunction]) {
+			if (!(packageAndFunction in FUNCTIONS)) {
 				FUNCTIONS[packageAndFunction] = [];
 			}
 
@@ -508,7 +533,7 @@ function clearAndProcessDefinitions(documentURI: string, fileContent: string) {
 
 // TODO: Move this to a Worker thread?
 export function readSingleFile(documentURI: string, fileContent: string) {
-	if (!debounceFileProcess[documentURI]) {
+	if (!(documentURI in debounceFileProcess)) {
 		clearAndProcessDefinitions(documentURI, fileContent);
 	} else {
 		clearTimeout(debounceFileProcess[documentURI]);
@@ -532,8 +557,10 @@ export function clearDefinitions(documentURI: string) {
 
 		// Remove references to all functions defined in this file
 		for (const f of PACKAGES[packageName].functions) {
+			delete FUNCTION_MAP[f]?.[documentURI];
+
 			const funcFullName = `${packageName}::${f}`;
-			if (!FUNCTIONS[funcFullName]) {
+			if (!(funcFullName in FUNCTIONS)) {
 				// FIXME: Should probably look into why this happens
 				continue;
 			}
@@ -551,7 +578,7 @@ export function clearDefinitions(documentURI: string) {
 			delete PACKAGES[packageName];
 		} else {
 			for (let i = PACKAGES[packageName].functions.length - 1; i > 0; --i) {
-				if (file.functions[`${packageName}::${PACKAGES[packageName].functions[i]}`]) {
+				if (`${packageName}::${PACKAGES[packageName].functions[i]}` in file.functions) {
 					PACKAGES[packageName].functions.splice(i, 1);
 				}
 			}
