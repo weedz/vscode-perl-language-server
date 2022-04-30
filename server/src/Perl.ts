@@ -211,7 +211,7 @@ export function onDefinition(definition: DefinitionParams): DefinitionLink[] {
 			const instance = getIdentifierNameFromLine(word.line, { line: 0, character: word.startIndex - 2 });
 			if (instance.identifier in PACKAGES) {
 				identifier = `${instance.identifier}::${identifier}`;
-			} else {
+			} else if (identifier in FUNCTION_MAP) {
 				for (const where of Object.values(FUNCTION_MAP[identifier])) {
 					definitions.push(createDefinition(identifier, where.location, 4));
 				}
