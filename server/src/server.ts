@@ -129,14 +129,26 @@ connection.onInitialized(async _ => {
 			if (!validPerlFile(filePath)) {
 				return;
 			}
-			const content = await fs.readFile(new URL(`${activeWorkspaceRoot}/${filePath}`));
+			const documentURI = new URL(`${activeWorkspaceRoot}/${filePath}`);
+			try {
+				await fs.access(documentURI);
+			} catch(_) {
+				return;
+			}
+			const content = await fs.readFile(documentURI);
 			readSingleFile(`${activeWorkspaceRoot}/${filePath}`, content.toString());
 		});
 		watcher.on("change", async filePath => {
 			if (!validPerlFile(filePath)) {
 				return;
 			}
-			const content = await fs.readFile(new URL(`${activeWorkspaceRoot}/${filePath}`));
+			const documentURI = new URL(`${activeWorkspaceRoot}/${filePath}`);
+			try {
+				await fs.access(documentURI);
+			} catch(_) {
+				return;
+			}
+			const content = await fs.readFile(documentURI);
 			readSingleFile(`${activeWorkspaceRoot}/${filePath}`, content.toString());
 		});
 	}
