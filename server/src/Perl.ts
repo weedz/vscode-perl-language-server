@@ -243,9 +243,25 @@ export function onDefinition(definition: DefinitionParams): DefinitionLink[] {
 		}
 	}
 
-	if (!definitions.length && identifier in FUNCTION_MAP) {
-		for (const where of Object.values(FUNCTION_MAP[identifier])) {
-			definitions.push(createDefinition(identifier, where.location, 4));
+	if (!definitions.length)
+	{
+		if (identifier in FUNCTION_MAP) {
+			for (const where of Object.values(FUNCTION_MAP[identifier])) {
+				definitions.push(createDefinition(identifier, where.location, 4));
+			}
+		}
+
+		const rindex = identifier.lastIndexOf("::");
+		if (rindex !== -1) {
+			const func = identifier.substring(rindex + 2);
+			const packageName = identifier.substring(0, rindex);
+			if (func in FUNCTION_MAP) {
+				for (const where of Object.values(FUNCTION_MAP[func])) {
+					if (where.package.includes(packageName)) {
+						definitions.push(createDefinition(func, where.location, 4));
+					}
+				}
+			}
 		}
 	}
 
