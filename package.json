@@ -59,8 +59,7 @@
 		"esbuild-base": "esbuild extension=./client/src/extension.ts server=./server/src/server.ts --bundle --outdir=out --external:vscode --external:fsevents --format=cjs --platform=node",
 		"swc": "swc out/extension.js out/server.js -d out",
 		"esbuild": "npm run esbuild-base -- --sourcemap",
-		"esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
-		"test-compile": "tsc -p ./"
+		"esbuild-watch": "npm run esbuild-base -- --sourcemap --watch"
 	},
 	"devDependencies": {
 		"@swc/cli": "^0.1.57",

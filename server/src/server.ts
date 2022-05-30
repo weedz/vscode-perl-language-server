@@ -14,7 +14,7 @@ import {
 import * as fs from "fs/promises";
 import { watch, FSWatcher } from "chokidar";
 import { clearDefinitions, onCompletion, onDefinition, onDocumentSymbol, onWorkspaceSymbol, readSingleFile, validPerlFile } from './Perl';
-import { DEBUG_MEASURE_SINGLE_FILE, DEBUG_MEASURE_TIME, documentsListen, getDocuments } from './config';
+import { DEBUG_MEASURE_SINGLE_FILE, DEBUG_MEASURE_TIME, documentsListen, getDocuments } from './Document';
 
 let watcher: FSWatcher;
 
@@ -78,7 +78,6 @@ connection.onInitialize(async (params: InitializeParams) => {
 			completionProvider: {
 				// TODO: This could maybe add argument lists or parse comment/doc for the given function?
 				// resolveProvider: true,
-				// triggerCharacters: []
 			},
 			definitionProvider: true,
 			documentSymbolProvider: true,
