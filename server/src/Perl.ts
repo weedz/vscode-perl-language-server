@@ -491,6 +491,13 @@ function processContent(documentURI: string, content: string) {
 					packageName: filePackageName,
 					line: 1,
 				});
+				if (!(filePackageName in PACKAGES)) {
+					PACKAGES[filePackageName] = {
+						locations: [],
+						packages: {},
+						functions: [],
+					};
+				}
 				PACKAGES[filePackageName].locations.push({
 					file: documentURI,
 					line: 1
