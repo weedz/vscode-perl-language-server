@@ -236,11 +236,9 @@ export function onDefinition(definition: DefinitionParams): DefinitionLink[] {
 
 	// Lookup package
 	if (identifier in PACKAGES) {
-		for (const location of PACKAGES[identifier].locations) {
-			for (const p of FILES[location.file].packages.filter(p => p.packageName === identifier)) {
-				definitions.push(createDefinition(identifier, location, 8));
-			}
-		}
+		definitions.push(...PACKAGES[identifier].locations.map(
+			location => FILES[location.file].packages.filter(p => p.packageName === identifier).map(_ => createDefinition(identifier, location, 8))
+		).flat());
 	}
 
 	if (!definitions.length)
@@ -354,7 +352,7 @@ export function onCompletion(textDocumentPosition: TextDocumentPositionParams): 
 	return functions.concat(packages);
 }
 
-function objectIsEmpty(obj: any) {
+function objectIsEmpty(obj: Record<string, unknown>) {
 	for (const key in obj) {
 		return false;
 	}
@@ -561,7 +559,7 @@ function clearAndProcessDefinitions(documentURI: string, fileContent: string) {
 }
 
 // TODO: Move this to a Worker thread?
-export function readSingleFile(documentURI: string, fileContent: string) {
+export function readSingleFile(documentURI: string, fileContent: string): void {
 	if (!(documentURI in debounceFileProcess)) {
 		clearAndProcessDefinitions(documentURI, fileContent);
 	} else {
@@ -573,7 +571,7 @@ export function readSingleFile(documentURI: string, fileContent: string) {
 	}
 }
 
-export function clearDefinitions(documentURI: string) {
+export function clearDefinitions(documentURI: string): void {
 	DEBUG_MEASURE_TIME && console.time(`clearDefinitions(): ${documentURI}`);
 	const file = FILES[documentURI];
 	if (!file) {
@@ -620,6 +618,6 @@ export function clearDefinitions(documentURI: string) {
 	DEBUG_MEASURE_TIME && console.timeEnd(`clearDefinitions(): ${documentURI}`);
 }
 
-export function validPerlFile(filePath: string) {
+export function validPerlFile(filePath: string): boolean {
 	return defs.file.test(filePath);
 }

@@ -14,7 +14,7 @@ import {
 import * as fs from "fs/promises";
 import { watch, FSWatcher } from "chokidar";
 import { clearDefinitions, onCompletion, onDefinition, onDocumentSymbol, onWorkspaceSymbol, readSingleFile, validPerlFile } from './Perl';
-import { DEBUG_MEASURE_SINGLE_FILE, DEBUG_MEASURE_TIME, documentsListen, getDocuments } from './Document';
+import { documentsListen, getDocuments } from './Document';
 
 let watcher: FSWatcher;
 

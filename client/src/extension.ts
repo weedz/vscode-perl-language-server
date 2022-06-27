@@ -3,8 +3,9 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import * as path from 'path';
-import { workspace, ExtensionContext } from 'vscode';
+import * as path from "path";
+// eslint-disable-next-line import/no-unresolved
+import { ExtensionContext } from "vscode";
 
 import {
 	LanguageClient,
@@ -15,7 +16,7 @@ import {
 
 let client: LanguageClient;
 
-export function activate(context: ExtensionContext) {
+export function activate(context: ExtensionContext): void {
 	// The server is implemented in node
 	const serverModule = context.asAbsolutePath(
 		path.join("out", "server.js")

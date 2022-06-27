@@ -7,14 +7,14 @@ export const DEBUG_MEASURE_SINGLE_FILE = false;
 // Create a simple text document manager.
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 
-export function documentsListen(connection: Connection) {
+export function documentsListen(connection: Connection): void {
     documents.listen(connection);
 }
 
-export function getDocuments() {
+export function getDocuments(): TextDocuments<TextDocument> {
     return documents;
 }
 
-export function getDocument(documentURI: string) {
+export function getDocument(documentURI: string): TextDocument | undefined {
     return documents.get(documentURI);
 }
