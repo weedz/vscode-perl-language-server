@@ -8,12 +8,12 @@ import {
 	InitializeParams,
 	DidChangeConfigurationNotification,
 	TextDocumentSyncKind,
-	InitializeResult
+	InitializeResult,
 } from 'vscode-languageserver/node';
 
 import * as fs from "fs/promises";
 import { watch, FSWatcher } from "chokidar";
-import { clearDefinitions, onCompletion, onDefinition, onDocumentSymbol, onWorkspaceSymbol, readSingleFile, validPerlFile } from './Perl';
+import { clearDefinitions, onCompletion, onDefinition, onDocumentSymbol, onWorkspaceSymbol, readSingleFile, validPerlFile, onSignatureHelp } from './Perl';
 import { documentsListen, getDocuments } from './Document';
 
 let watcher: FSWatcher;
@@ -78,11 +78,18 @@ connection.onInitialize(async (params: InitializeParams) => {
 			completionProvider: {
 				// TODO: This could maybe add argument lists or parse comment/doc for the given function?
 				// resolveProvider: true,
+				completionItem: {
+					labelDetailsSupport: true,
+				}
+			},
+			signatureHelpProvider: {
+				triggerCharacters: ["("],
+				retriggerCharacters: [","]
 			},
 			definitionProvider: true,
 			documentSymbolProvider: true,
 			workspaceSymbolProvider: true,
-			// signatureHelpProvider: true, // TODO: Implement this?
+			// inlayHintProvider: true,
 		},
 	};
 	if (hasWorkspaceFolderCapability) {
@@ -202,6 +209,13 @@ connection.onDefinition(onDefinition);
 
 // This handler provides the initial list of the completion items.
 connection.onCompletion(onCompletion);
+// connection.onCompletionResolve((_params) => {
+// 	return [];
+// });
+
+connection.onSignatureHelp(onSignatureHelp);
+
+// connection.onRequest(InlayHintRequest.type, onInlayHints);
 
 // Make the text document manager listen on the connection
 // for open, change and close text document events
