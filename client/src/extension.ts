@@ -4,7 +4,6 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as path from "path";
-// eslint-disable-next-line import/no-unresolved
 import { ExtensionContext } from "vscode";
 
 import {

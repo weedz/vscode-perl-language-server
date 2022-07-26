@@ -1,4 +1,4 @@
-import { CompletionItem, CompletionItemKind, DefinitionLink, DefinitionParams, DocumentSymbol, DocumentSymbolParams, Position, SymbolInformation, SymbolKind, TextDocumentIdentifier, TextDocumentPositionParams, WorkspaceSymbolParams } from "vscode-languageserver";
+import { CompletionItem, CompletionItemKind, DefinitionLink, DefinitionParams, DocumentSymbol, DocumentSymbolParams, InlayHint, InlayHintParams, Position, SignatureHelp, SignatureHelpParams, SymbolInformation, SymbolKind, TextDocumentIdentifier, TextDocumentPositionParams, WorkspaceSymbolParams } from "vscode-languageserver";
 import { DEBUG_MEASURE_SINGLE_FILE, DEBUG_MEASURE_TIME, getDocument } from "./Document";
 
 interface Location {
@@ -39,6 +39,9 @@ interface Files {
 			[functionName: string]: {
 				line: number
 				endLine: number
+				arguments: Array<{
+					name: string
+				}>
 			}
 		}
 	}
@@ -268,7 +271,7 @@ export function onDefinition(definition: DefinitionParams): DefinitionLink[] {
 	return definitions;
 }
 
-function createDefinition(definitionName: string, location: Location, prefixLength: number) {
+function createDefinition(definitionName: string, location: Location, prefixLength: number): DefinitionLink {
 	return {
 		targetUri: location.file,
 		targetRange: {
@@ -292,6 +295,95 @@ function createDefinition(definitionName: string, location: Location, prefixLeng
 			}
 		},
 	};
+}
+
+export function onInlayHints(_params: InlayHintParams): InlayHint[] {
+	// console.log("onInlayHints", params);
+	return [];
+}
+
+function createSignature(documentURI: string, activeLine: string, packageAndFunction: string) {
+	const currentParameterList = activeLine.substring(activeLine.lastIndexOf("("));
+	const activeParameter = currentParameterList.split(",").length - 1;
+
+	// console.log(documentURI, packageAndFunction);
+	
+	const signature = FILES[documentURI].functions[packageAndFunction].arguments;
+	return {
+		label: `${packageAndFunction}(${signature.map(arg => arg.name).join(", ")})`,
+		parameters: signature.map(arg => ({
+			label: arg.name
+		})),
+		activeParameter
+	} as SignatureHelp["signatures"][0];
+}
+
+export function onSignatureHelp(params: SignatureHelpParams): SignatureHelp | null {
+	DEBUG_MEASURE_TIME && console.time("onSignatureHelp");
+	// console.log("onSignatureHelp", params);
+	const currentLine = getTargetLineInDocument(params.textDocument, params.position);
+	if (!currentLine) {
+		DEBUG_MEASURE_TIME && console.timeEnd("onSignatureHelp");
+		return null;
+	}
+	const activeLine = currentLine.substring(0,params.position.character);
+	const position: Position = {
+		character: activeLine.lastIndexOf("(") - 1,
+		line: params.position.line,
+	};
+
+	// console.log(activeLine.substring(activeLine.lastIndexOf("(")));
+
+	const word = getIdentifierNameAtPosition(params.textDocument, position);
+	if (!word?.identifier || word?.line.startsWith("sub ")) {
+		// console.log("no identifier");
+		DEBUG_MEASURE_TIME && console.timeEnd("onSignatureHelp");
+		return null;
+	}
+
+	// console.log(activeLine, word);
+
+	const signatures: SignatureHelp["signatures"] = [];
+
+	let identifier = word.identifier;
+
+	if (!identifier.includes("::")) {
+		// Resolve something like Obj::A->new() to Obj::A::new
+		if (activeLine.substring(word.startIndex - 2, word.startIndex) === "->") {
+			const instance = getIdentifierNameFromLine(activeLine, { line: 0, character: word.startIndex - 2 });
+			// console.log(instance);
+			if (instance.identifier in PACKAGES) {
+				identifier = `${instance.identifier}::${identifier}`;
+			} else if (identifier in FUNCTION_MAP) {
+				for (const where of Object.values(FUNCTION_MAP[identifier])) {
+					signatures.push(createSignature(where.location.file, activeLine, `${where.package}::${identifier}`));
+				}
+			}
+		}
+
+		// Find functions in this document
+		const filePackage = FILES[params.textDocument.uri];
+		for (const p of filePackage.packages) {
+			const funcs = FUNCTIONS[`${p.packageName}::${identifier}`] || [];
+			for (const location of funcs.filter(f => f.file === params.textDocument.uri)) {
+				signatures.push(createSignature(location.file, activeLine, `${p.packageName}::${identifier}`));
+			}
+		}
+	}
+
+	if (identifier in FUNCTIONS) {
+		for (const location of FUNCTIONS[identifier]) {
+			signatures.push(createSignature(location.file, activeLine, identifier));
+		}
+	}
+
+	const signatureHelp: SignatureHelp = {
+		activeSignature: 0,
+		signatures,
+	};
+	// console.log(signatures);
+	DEBUG_MEASURE_TIME && console.timeEnd("onSignatureHelp");
+	return signatureHelp;
 }
 
 export function onCompletion(textDocumentPosition: TextDocumentPositionParams): CompletionItem[] {
@@ -319,10 +411,21 @@ export function onCompletion(textDocumentPosition: TextDocumentPositionParams): 
 				insertText: p.substring(packageName.length + 2), // skip "parent" package name and "::"
 			}));
 
+			const location = PACKAGES[packageName].locations[0];
+
 			for (const f of PACKAGES[packageName].functions) {
+				const packageAndFunction = `${packageName}::${f}`;
+
+				const signature = FILES[location.file].functions[packageAndFunction].arguments.map(arg => arg.name).join(", ");
+
 				functions.push({
 					label: f,
 					kind: CompletionItemKind.Function,
+					detail: `${f}(${signature})`,
+					labelDetails: {
+						description: packageAndFunction,
+						detail: `(${signature})`
+					},
 				});
 			}
 		}
@@ -333,11 +436,18 @@ export function onCompletion(textDocumentPosition: TextDocumentPositionParams): 
 		}));
 
 		for (const p of FILES[documentURI].packages) {
+			const location = PACKAGES[p.packageName].locations[0];
 			for (const f of PACKAGES[p.packageName].functions) {
+				const packageAndFunction = `${p.packageName}::${f}`;
+				const signature = FILES[location.file].functions[packageAndFunction].arguments.map(arg => arg.name).join(", ");
 				functions.push({
 					label: f,
-					detail: `${p.packageName}::${f}`,
 					kind: CompletionItemKind.Function,
+					detail: `${f}(${signature})`,
+					labelDetails: {
+						description: packageAndFunction,
+						detail: `(${signature})`
+					},
 				});
 			}
 		}
@@ -437,11 +547,27 @@ function processContent(documentURI: string, content: string) {
 
 	let lastFunctionName: string | null = null;
 
+	let readArgs: boolean | string = false;
+	let functionArguments: Files[0]["functions"][0]["arguments"] = [];
+
 	const lines = content.split("\n");
 	const packages: Files[0]["packages"] = [];
 	const functions: Files[0]["functions"] = {};
 	for (let i = 0; i < lines.length; ++i) {
 		const line = lines[i];
+
+		if (readArgs) {
+			const args = parseFunctionArgs(readArgs);
+			if (args.length) {
+				functionArguments.push(...args);
+				readArgs = false;
+			} else {
+				readArgs += line;
+				if (readArgs.length > 1000) {
+					readArgs = false;
+				}
+			}
+		}
 
 		const packageName = line.match(defs.package)?.[1];
 		if (packageName) {
@@ -482,6 +608,9 @@ function processContent(documentURI: string, content: string) {
 		}
 		const functionDefinition = line.match(defs.function)?.[1];
 		if (functionDefinition) {
+			readArgs = line;
+			functionArguments = [];
+
 			if (!filePackageName) {
 				// Assume a missing "main" package definition
 				filePackageName = "main";
@@ -517,6 +646,7 @@ function processContent(documentURI: string, content: string) {
 
 			if (lastFunctionName) {
 				functions[lastFunctionName].endLine = i;
+				// functions[lastFunctionName].arguments = functionArguments;
 			}
 
 			const packageAndFunction = `${filePackageName}::${functionDefinition}`;
@@ -535,18 +665,47 @@ function processContent(documentURI: string, content: string) {
 			functions[packageAndFunction] = {
 				line: i + 1,
 				endLine: i + 1,
+				arguments: functionArguments,
 			};
 		}
 	}
 
 	if (lastFunctionName) {
 		functions[lastFunctionName].endLine = lines.length;
+		// functions[lastFunctionName].arguments = functionArguments;
 	}
 
 	FILES[documentURI] = {
 		packages,
 		functions
 	};
+}
+
+function parseFunctionArgs(line: string) {
+	const args: Files[0]["functions"][0]["arguments"] = [];
+
+	// Check if line contains a single argument
+	let match = /my (?<name>.+) = shift/.exec(line);
+	if (match?.groups) {
+		if (match.groups.name !== "$self") {
+			args.push({name: match.groups.name});
+		}
+	} else {
+		// Check if line contains all arguments
+		match = /my [(](?<args>.+)[)]\s*=\s*@_/.exec(line);
+		if (match?.groups) {
+			args.push(
+				...match.groups.args
+					.split(",")
+					.map(arg => ({
+						name: arg.trim()
+					}))
+					.filter(arg => arg.name !== "$self")
+			);
+		}
+	}
+
+	return args;
 }
 
 const debounceFileProcess: Record<string, NodeJS.Timeout> = {};
