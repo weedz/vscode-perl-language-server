@@ -305,13 +305,11 @@ export function onInlayHints(_params: InlayHintParams): InlayHint[] {
 function createSignature(documentURI: string, activeLine: string, packageAndFunction: string) {
 	const currentParameterList = activeLine.substring(activeLine.lastIndexOf("("));
 	const activeParameter = currentParameterList.split(",").length - 1;
-
-	// console.log(documentURI, packageAndFunction);
 	
-	const signature = FILES[documentURI].functions[packageAndFunction].arguments;
+	const argumentList = FILES[documentURI].functions[packageAndFunction].arguments;
 	return {
-		label: `${packageAndFunction}(${signature.map(arg => arg.name).join(", ")})`,
-		parameters: signature.map(arg => ({
+		label: `${packageAndFunction}(${argumentList.map(arg => arg.name).join(", ")})`,
+		parameters: argumentList.map(arg => ({
 			label: arg.name
 		})),
 		activeParameter
@@ -320,7 +318,7 @@ function createSignature(documentURI: string, activeLine: string, packageAndFunc
 
 export function onSignatureHelp(params: SignatureHelpParams): SignatureHelp | null {
 	DEBUG_MEASURE_TIME && console.time("onSignatureHelp");
-	// console.log("onSignatureHelp", params);
+
 	const currentLine = getTargetLineInDocument(params.textDocument, params.position);
 	if (!currentLine) {
 		DEBUG_MEASURE_TIME && console.timeEnd("onSignatureHelp");
@@ -332,16 +330,11 @@ export function onSignatureHelp(params: SignatureHelpParams): SignatureHelp | nu
 		line: params.position.line,
 	};
 
-	// console.log(activeLine.substring(activeLine.lastIndexOf("(")));
-
 	const word = getIdentifierNameAtPosition(params.textDocument, position);
 	if (!word?.identifier || word?.line.startsWith("sub ")) {
-		// console.log("no identifier");
 		DEBUG_MEASURE_TIME && console.timeEnd("onSignatureHelp");
 		return null;
 	}
-
-	// console.log(activeLine, word);
 
 	const signatures: SignatureHelp["signatures"] = [];
 
@@ -351,7 +344,6 @@ export function onSignatureHelp(params: SignatureHelpParams): SignatureHelp | nu
 		// Resolve something like Obj::A->new() to Obj::A::new
 		if (activeLine.substring(word.startIndex - 2, word.startIndex) === "->") {
 			const instance = getIdentifierNameFromLine(activeLine, { line: 0, character: word.startIndex - 2 });
-			// console.log(instance);
 			if (instance.identifier in PACKAGES) {
 				identifier = `${instance.identifier}::${identifier}`;
 			} else if (identifier in FUNCTION_MAP) {
@@ -381,7 +373,7 @@ export function onSignatureHelp(params: SignatureHelpParams): SignatureHelp | nu
 		activeSignature: 0,
 		signatures,
 	};
-	// console.log(signatures);
+
 	DEBUG_MEASURE_TIME && console.timeEnd("onSignatureHelp");
 	return signatureHelp;
 }
@@ -400,8 +392,6 @@ export function onCompletion(textDocumentPosition: TextDocumentPositionParams): 
 
 	let packages: CompletionItem[] = [];
 	const functions: CompletionItem[] = [];
-
-	console.log("Identifier:", identifier);
 
 	if (identifier.includes("::")) {
 		const packageName = identifier.slice(0, identifier.lastIndexOf("::"));
@@ -543,7 +533,11 @@ function processContent(documentURI: string, content: string) {
 
 	let lastFunctionName: string | null = null;
 
-	let readArgs: boolean | string = false;
+	let readArgs = {
+		failed_lines: 0,
+		reading: false
+	};
+
 	let functionArguments: Files[0]["functions"][0]["arguments"] = [];
 
 	const lines = content.split("\n");
@@ -552,15 +546,24 @@ function processContent(documentURI: string, content: string) {
 	for (let i = 0; i < lines.length; ++i) {
 		const line = lines[i];
 
-		if (readArgs) {
-			const args = parseFunctionArgs(readArgs);
-			if (args.length) {
-				functionArguments.push(...args);
-				readArgs = false;
+		if (readArgs.reading) {
+			const args = parseFunctionArgs(line);
+			if (!args) {
+				readArgs = {
+					failed_lines: 0,
+					reading: false
+				};
 			} else {
-				readArgs += line;
-				if (readArgs.length > 1000) {
-					readArgs = false;
+				if (args.length) {
+					functionArguments.push(...args);
+				} else {
+					readArgs.failed_lines++;
+					if (readArgs.failed_lines > 10) {
+						readArgs = {
+							failed_lines: 0,
+							reading: false
+						};
+					}
 				}
 			}
 		}
@@ -604,7 +607,7 @@ function processContent(documentURI: string, content: string) {
 		}
 		const functionDefinition = line.match(defs.function)?.[1];
 		if (functionDefinition) {
-			readArgs = line;
+			readArgs.reading = true;
 			functionArguments = [];
 
 			if (!filePackageName) {
@@ -679,6 +682,10 @@ function processContent(documentURI: string, content: string) {
 
 function parseFunctionArgs(line: string) {
 	const args: Files[0]["functions"][0]["arguments"] = [];
+
+	if (line.trimStart().startsWith("sub ")) {
+		return;
+	}
 
 	// Check if line contains a single argument
 	let match = /my (?<name>.+) = shift/.exec(line);
