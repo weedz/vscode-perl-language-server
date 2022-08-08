@@ -12,7 +12,7 @@ interface Packages {
 		packages: {
 			[packageName: string]: number
 		}
-		functions: string[]
+		functions: Set<string>
 	}
 }
 
@@ -50,7 +50,7 @@ interface Files {
 const PACKAGES: Packages = {
 	main: {
 		locations: [],
-		functions: [],
+		functions: new Set(),
 		packages: {},
 	}
 };
@@ -401,6 +401,8 @@ export function onCompletion(textDocumentPosition: TextDocumentPositionParams): 
 	let packages: CompletionItem[] = [];
 	const functions: CompletionItem[] = [];
 
+	console.log("Identifier:", identifier);
+
 	if (identifier.includes("::")) {
 		const packageName = identifier.slice(0, identifier.lastIndexOf("::"));
 		if (packageName in PACKAGES) {
@@ -411,23 +413,7 @@ export function onCompletion(textDocumentPosition: TextDocumentPositionParams): 
 				insertText: p.substring(packageName.length + 2), // skip "parent" package name and "::"
 			}));
 
-			const location = PACKAGES[packageName].locations[0];
-
-			for (const f of PACKAGES[packageName].functions) {
-				const packageAndFunction = `${packageName}::${f}`;
-
-				const signature = FILES[location.file].functions[packageAndFunction].arguments.map(arg => arg.name).join(", ");
-
-				functions.push({
-					label: f,
-					kind: CompletionItemKind.Function,
-					detail: `${f}(${signature})`,
-					labelDetails: {
-						description: packageAndFunction,
-						detail: `(${signature})`
-					},
-				});
-			}
+			functions.push(...findFunctionsInPackage(packageName));
 		}
 	} else {
 		packages = Object.keys(PACKAGES).map(p => ({
@@ -436,20 +422,7 @@ export function onCompletion(textDocumentPosition: TextDocumentPositionParams): 
 		}));
 
 		for (const p of FILES[documentURI].packages) {
-			const location = PACKAGES[p.packageName].locations[0];
-			for (const f of PACKAGES[p.packageName].functions) {
-				const packageAndFunction = `${p.packageName}::${f}`;
-				const signature = FILES[location.file].functions[packageAndFunction].arguments.map(arg => arg.name).join(", ");
-				functions.push({
-					label: f,
-					kind: CompletionItemKind.Function,
-					detail: `${f}(${signature})`,
-					labelDetails: {
-						description: packageAndFunction,
-						detail: `(${signature})`
-					},
-				});
-			}
+			functions.push(...findFunctionsInPackage(p.packageName));
 		}
 	}
 
@@ -460,6 +433,29 @@ export function onCompletion(textDocumentPosition: TextDocumentPositionParams): 
 	DEBUG_MEASURE_TIME && console.timeEnd("onCompletion");
 
 	return functions.concat(packages);
+}
+
+function findFunctionsInPackage(packageName: string) {
+	const functions: CompletionItem[] = [];
+
+	for (const functionName of PACKAGES[packageName].functions) {
+		const packageAndFunction = `${packageName}::${functionName}`;
+
+		for (const location of FUNCTIONS[packageAndFunction]) {
+			const signature = FILES[location.file].functions[packageAndFunction].arguments.map(arg => arg.name).join(", ");
+			functions.push({
+				label: functionName,
+				kind: CompletionItemKind.Function,
+				detail: `${functionName}(${signature})`,
+				labelDetails: {
+					description: packageAndFunction,
+					detail: `(${signature})`
+				},
+			});
+		}
+	}
+
+	return functions;
 }
 
 function objectIsEmpty(obj: Record<string, unknown>) {
@@ -474,7 +470,7 @@ function getFlatPackageTree(packageName: string) {
 		return [packageName];
 	}
 	const packages: string[] = [];
-	if (PACKAGES[packageName].functions.length) {
+	if (PACKAGES[packageName].functions.size) {
 		packages.push(packageName);
 	}
 	for (const p of Object.keys(PACKAGES[packageName].packages)) {
@@ -586,7 +582,7 @@ function processContent(documentURI: string, content: string) {
 					PACKAGES[fullPackageTree] = {
 						locations: [],
 						packages: {},
-						functions: [],
+						functions: new Set(),
 					};
 				}
 			
@@ -622,7 +618,7 @@ function processContent(documentURI: string, content: string) {
 					PACKAGES[filePackageName] = {
 						locations: [],
 						packages: {},
-						functions: [],
+						functions: new Set(),
 					};
 				}
 				PACKAGES[filePackageName].locations.push({
@@ -642,7 +638,7 @@ function processContent(documentURI: string, content: string) {
 				}
 			};
 
-			PACKAGES[filePackageName].functions.push(functionDefinition);
+			PACKAGES[filePackageName].functions.add(functionDefinition);
 
 			if (lastFunctionName) {
 				functions[lastFunctionName].endLine = i;
@@ -755,6 +751,7 @@ export function clearDefinitions(documentURI: string): void {
 	
 			if (FUNCTIONS[funcFullName].length === 0) {
 				delete FUNCTIONS[funcFullName];
+				PACKAGES[packageName].functions.delete(f);
 			}
 		}
 	
@@ -762,12 +759,6 @@ export function clearDefinitions(documentURI: string): void {
 		PACKAGES[packageName].locations.splice(PACKAGES[packageName].locations.findIndex(l => l.file === documentURI)>>>0, 1);
 		if (PACKAGES[packageName].locations.length === 0) {
 			delete PACKAGES[packageName];
-		} else {
-			for (let i = PACKAGES[packageName].functions.length - 1; i > 0; --i) {
-				if (`${packageName}::${PACKAGES[packageName].functions[i]}` in file.functions) {
-					PACKAGES[packageName].functions.splice(i, 1);
-				}
-			}
 		}
 	}
 	
