@@ -1,5 +1,6 @@
-import { CompletionItem, CompletionItemKind, DefinitionLink, DefinitionParams, DocumentSymbol, DocumentSymbolParams, InlayHint, InlayHintParams, Position, SignatureHelp, SignatureHelpParams, SymbolInformation, SymbolKind, TextDocumentIdentifier, TextDocumentPositionParams, WorkspaceSymbolParams } from "vscode-languageserver";
+import { CompletionItem, CompletionItemKind, DefinitionLink, DefinitionParams, DocumentSymbol, DocumentSymbolParams, InlayHint, InlayHintParams, MarkupKind, Position, SignatureHelp, SignatureHelpParams, SymbolInformation, SymbolKind, TextDocumentIdentifier, TextDocumentPositionParams, WorkspaceSymbolParams } from "vscode-languageserver";
 import { DEBUG_MEASURE_SINGLE_FILE, DEBUG_MEASURE_TIME, getDocument } from "./Document";
+import { builtin_functions } from "./PerlBuiltins";
 
 interface Location {
 	file: string
@@ -351,6 +352,21 @@ export function onSignatureHelp(params: SignatureHelpParams): SignatureHelp | nu
 					signatures.push(createSignature(where.location.file, activeLine, `${where.package}::${identifier}`));
 				}
 			}
+		} else if (identifier in builtin_functions) {
+			const currentParameterList = activeLine.substring(activeLine.lastIndexOf("("));
+			const activeParameter = currentParameterList.split(",").length - 1;
+			const argumentList = builtin_functions[identifier].arguments;
+			signatures.push({
+				label: `${identifier}(${argumentList.map(arg => arg.name).join(", ")})`,
+				documentation: {
+					kind: MarkupKind.Markdown,
+					value: `@see [docs](${builtin_functions[identifier].link})`
+				},
+				parameters: argumentList.map(arg => ({
+					label: arg.name
+				})),
+				activeParameter
+			});
 		}
 
 		// Find functions in this document
@@ -409,6 +425,23 @@ export function onCompletion(textDocumentPosition: TextDocumentPositionParams): 
 		packages = Object.keys(PACKAGES).map(p => ({
 			label: p,
 			kind: CompletionItemKind.Module,
+		}));
+
+		functions.push(...Object.entries(builtin_functions).map( ([functionName, f]) => {
+			const signature = f.arguments.map(arg => arg.name).join(", ");
+			return {
+				label: functionName,
+				kind: CompletionItemKind.Function,
+				detail: `${functionName}(${signature})`,
+				labelDetails: {
+					description: `CORE::${functionName}`,
+					detail: `(${signature})`
+				},
+				documentation: {
+					kind: MarkupKind.Markdown,
+					value: `@see [docs](${f.link})`
+				},
+			} as CompletionItem;
 		}));
 
 		for (const p of FILES[documentURI].packages) {

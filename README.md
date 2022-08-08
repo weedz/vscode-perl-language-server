@@ -9,6 +9,8 @@ Performs a really basic static analyze of perl code to provide the following:
 - Autocomplete (packages and functions)
 - Signature help
 
+Including completion and signature help for most [builtin functions](https://metacpan.org/dist/perl/view/pod/perlfunc.pod)
+
 The way this is implemented means the following perl program will create a function symbol `hello`:
 ```perl
 my $str = q^
