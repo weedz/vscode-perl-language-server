@@ -355,18 +355,21 @@ export function onSignatureHelp(params: SignatureHelpParams): SignatureHelp | nu
 		} else if (identifier in builtin_functions) {
 			const currentParameterList = activeLine.substring(activeLine.lastIndexOf("("));
 			const activeParameter = currentParameterList.split(",").length - 1;
-			const argumentList = builtin_functions[identifier].arguments;
-			signatures.push({
-				label: `${identifier}(${argumentList.map(arg => arg.name).join(", ")})`,
-				documentation: {
-					kind: MarkupKind.Markdown,
-					value: `@see [docs](${builtin_functions[identifier].link})`
-				},
-				parameters: argumentList.map(arg => ({
-					label: arg.name
-				})),
-				activeParameter
-			});
+
+			signatures.push(...builtin_functions[identifier].map(f => {
+				const argumentList = f.arguments;
+				return {
+					label: `${identifier}(${argumentList.join(", ")})`,
+					documentation: {
+						kind: MarkupKind.Markdown,
+						value: `@see [docs](${f.link})`
+					},
+					parameters: argumentList.map(arg => ({
+						label: arg
+					})),
+					activeParameter
+				};
+			}));
 		}
 
 		// Find functions in this document
@@ -427,22 +430,24 @@ export function onCompletion(textDocumentPosition: TextDocumentPositionParams): 
 			kind: CompletionItemKind.Module,
 		}));
 
-		functions.push(...Object.entries(builtin_functions).map( ([functionName, f]) => {
-			const signature = f.arguments.map(arg => arg.name).join(", ");
-			return {
-				label: functionName,
-				kind: CompletionItemKind.Function,
-				detail: `${functionName}(${signature})`,
-				labelDetails: {
-					description: `CORE::${functionName}`,
-					detail: `(${signature})`
-				},
-				documentation: {
-					kind: MarkupKind.Markdown,
-					value: `@see [docs](${f.link})`
-				},
-			} as CompletionItem;
-		}));
+		functions.push(...Object.entries(builtin_functions)
+			.flatMap( ([functionName, x]) => x.map(f => {
+				const signature = f.arguments.join(", ");
+				return {
+					label: functionName,
+					kind: CompletionItemKind.Function,
+					detail: `${functionName}(${signature})`,
+					labelDetails: {
+						description: `CORE::${functionName}`,
+						detail: `(${signature})`
+					},
+					documentation: {
+						kind: MarkupKind.Markdown,
+						value: `@see [docs](${f.link})`
+					},
+				} as CompletionItem;
+			}))
+		);
 
 		for (const p of FILES[documentURI].packages) {
 			functions.push(...findFunctionsInPackage(p.packageName));

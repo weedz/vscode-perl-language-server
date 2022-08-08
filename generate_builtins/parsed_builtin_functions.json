@@ -1,7 +1,4 @@
-export const builtin_functions: Record<string, Array<{
-    link: string
-    arguments: string[]
-}>> = {
+{
     "abs": [
         {
             "link": "https://metacpan.org/pod/perlfunc#abs-VALUE",
@@ -2510,4 +2507,4 @@ export const builtin_functions: Record<string, Array<{
             "arguments": []
         }
     ]
-};
+}

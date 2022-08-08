@@ -1,0 +1,1518 @@
+[
+    {
+        "name": "-X FILEHANDLE  ",
+        "link": "https://metacpan.org/pod/perlfunc#-X-FILEHANDLE"
+    },
+    {
+        "name": "-X EXPR",
+        "link": "https://metacpan.org/pod/perlfunc#-X-EXPR"
+    },
+    {
+        "name": "-X DIRHANDLE",
+        "link": "https://metacpan.org/pod/perlfunc#-X-DIRHANDLE"
+    },
+    {
+        "name": "-X",
+        "link": "https://metacpan.org/pod/perlfunc#-X"
+    },
+    {
+        "name": "abs VALUE  ",
+        "link": "https://metacpan.org/pod/perlfunc#abs-VALUE"
+    },
+    {
+        "name": "abs",
+        "link": "https://metacpan.org/pod/perlfunc#abs1"
+    },
+    {
+        "name": "accept NEWSOCKET,GENERICSOCKET ",
+        "link": "https://metacpan.org/pod/perlfunc#accept-NEWSOCKET,GENERICSOCKET"
+    },
+    {
+        "name": "alarm SECONDS   ",
+        "link": "https://metacpan.org/pod/perlfunc#alarm-SECONDS"
+    },
+    {
+        "name": "alarm",
+        "link": "https://metacpan.org/pod/perlfunc#alarm1"
+    },
+    {
+        "name": "atan2 Y,X    ",
+        "link": "https://metacpan.org/pod/perlfunc#atan2-Y,X"
+    },
+    {
+        "name": "bind SOCKET,NAME ",
+        "link": "https://metacpan.org/pod/perlfunc#bind-SOCKET,NAME"
+    },
+    {
+        "name": "binmode FILEHANDLE, LAYER     ",
+        "link": "https://metacpan.org/pod/perlfunc#binmode-FILEHANDLE,-LAYER"
+    },
+    {
+        "name": "binmode FILEHANDLE",
+        "link": "https://metacpan.org/pod/perlfunc#binmode-FILEHANDLE"
+    },
+    {
+        "name": "bless REF,CLASSNAME ",
+        "link": "https://metacpan.org/pod/perlfunc#bless-REF,CLASSNAME"
+    },
+    {
+        "name": "bless REF",
+        "link": "https://metacpan.org/pod/perlfunc#bless-REF"
+    },
+    {
+        "name": "break",
+        "link": "https://metacpan.org/pod/perlfunc#break"
+    },
+    {
+        "name": "caller EXPR    ",
+        "link": "https://metacpan.org/pod/perlfunc#caller-EXPR"
+    },
+    {
+        "name": "caller",
+        "link": "https://metacpan.org/pod/perlfunc#caller1"
+    },
+    {
+        "name": "chdir EXPR   ",
+        "link": "https://metacpan.org/pod/perlfunc#chdir-EXPR"
+    },
+    {
+        "name": "chdir FILEHANDLE",
+        "link": "https://metacpan.org/pod/perlfunc#chdir-FILEHANDLE"
+    },
+    {
+        "name": "chdir DIRHANDLE",
+        "link": "https://metacpan.org/pod/perlfunc#chdir-DIRHANDLE"
+    },
+    {
+        "name": "chdir",
+        "link": "https://metacpan.org/pod/perlfunc#chdir3"
+    },
+    {
+        "name": "chmod LIST   ",
+        "link": "https://metacpan.org/pod/perlfunc#chmod-LIST"
+    },
+    {
+        "name": "chomp VARIABLE     ",
+        "link": "https://metacpan.org/pod/perlfunc#chomp-VARIABLE"
+    },
+    {
+        "name": "chomp( LIST )",
+        "link": "https://metacpan.org/pod/perlfunc#chomp(-LIST-)"
+    },
+    {
+        "name": "chomp",
+        "link": "https://metacpan.org/pod/perlfunc#chomp2"
+    },
+    {
+        "name": "chop VARIABLE ",
+        "link": "https://metacpan.org/pod/perlfunc#chop-VARIABLE"
+    },
+    {
+        "name": "chop( LIST )",
+        "link": "https://metacpan.org/pod/perlfunc#chop(-LIST-)"
+    },
+    {
+        "name": "chop",
+        "link": "https://metacpan.org/pod/perlfunc#chop2"
+    },
+    {
+        "name": "chown LIST    ",
+        "link": "https://metacpan.org/pod/perlfunc#chown-LIST"
+    },
+    {
+        "name": "chr NUMBER    ",
+        "link": "https://metacpan.org/pod/perlfunc#chr-NUMBER"
+    },
+    {
+        "name": "chr",
+        "link": "https://metacpan.org/pod/perlfunc#chr1"
+    },
+    {
+        "name": "chroot FILENAME  ",
+        "link": "https://metacpan.org/pod/perlfunc#chroot-FILENAME"
+    },
+    {
+        "name": "chroot",
+        "link": "https://metacpan.org/pod/perlfunc#chroot1"
+    },
+    {
+        "name": "close FILEHANDLE ",
+        "link": "https://metacpan.org/pod/perlfunc#close-FILEHANDLE"
+    },
+    {
+        "name": "close",
+        "link": "https://metacpan.org/pod/perlfunc#close1"
+    },
+    {
+        "name": "closedir DIRHANDLE ",
+        "link": "https://metacpan.org/pod/perlfunc#closedir-DIRHANDLE"
+    },
+    {
+        "name": "connect SOCKET,NAME ",
+        "link": "https://metacpan.org/pod/perlfunc#connect-SOCKET,NAME"
+    },
+    {
+        "name": "continue BLOCK ",
+        "link": "https://metacpan.org/pod/perlfunc#continue-BLOCK"
+    },
+    {
+        "name": "continue",
+        "link": "https://metacpan.org/pod/perlfunc#continue1"
+    },
+    {
+        "name": "cos EXPR    ",
+        "link": "https://metacpan.org/pod/perlfunc#cos-EXPR"
+    },
+    {
+        "name": "cos",
+        "link": "https://metacpan.org/pod/perlfunc#cos1"
+    },
+    {
+        "name": "crypt PLAINTEXT,SALT          ",
+        "link": "https://metacpan.org/pod/perlfunc#crypt-PLAINTEXT,SALT"
+    },
+    {
+        "name": "dbmclose HASH ",
+        "link": "https://metacpan.org/pod/perlfunc#dbmclose-HASH"
+    },
+    {
+        "name": "dbmopen HASH,DBNAME,MASK     ",
+        "link": "https://metacpan.org/pod/perlfunc#dbmopen-HASH,DBNAME,MASK"
+    },
+    {
+        "name": "defined EXPR   ",
+        "link": "https://metacpan.org/pod/perlfunc#defined-EXPR"
+    },
+    {
+        "name": "defined",
+        "link": "https://metacpan.org/pod/perlfunc#defined1"
+    },
+    {
+        "name": "delete EXPR ",
+        "link": "https://metacpan.org/pod/perlfunc#delete-EXPR"
+    },
+    {
+        "name": "die LIST      ",
+        "link": "https://metacpan.org/pod/perlfunc#die-LIST"
+    },
+    {
+        "name": "do BLOCK  ",
+        "link": "https://metacpan.org/pod/perlfunc#do-BLOCK"
+    },
+    {
+        "name": "do EXPR ",
+        "link": "https://metacpan.org/pod/perlfunc#do-EXPR"
+    },
+    {
+        "name": "dump LABEL   ",
+        "link": "https://metacpan.org/pod/perlfunc#dump-LABEL"
+    },
+    {
+        "name": "dump EXPR",
+        "link": "https://metacpan.org/pod/perlfunc#dump-EXPR"
+    },
+    {
+        "name": "dump",
+        "link": "https://metacpan.org/pod/perlfunc#dump2"
+    },
+    {
+        "name": "each HASH  ",
+        "link": "https://metacpan.org/pod/perlfunc#each-HASH"
+    },
+    {
+        "name": "each ARRAY ",
+        "link": "https://metacpan.org/pod/perlfunc#each-ARRAY"
+    },
+    {
+        "name": "eof FILEHANDLE   ",
+        "link": "https://metacpan.org/pod/perlfunc#eof-FILEHANDLE"
+    },
+    {
+        "name": "eof ()",
+        "link": "https://metacpan.org/pod/perlfunc#eof-()"
+    },
+    {
+        "name": "eof",
+        "link": "https://metacpan.org/pod/perlfunc#eof2"
+    },
+    {
+        "name": "eval EXPR        ",
+        "link": "https://metacpan.org/pod/perlfunc#eval-EXPR"
+    },
+    {
+        "name": "eval BLOCK",
+        "link": "https://metacpan.org/pod/perlfunc#eval-BLOCK"
+    },
+    {
+        "name": "eval",
+        "link": "https://metacpan.org/pod/perlfunc#eval2"
+    },
+    {
+        "name": "evalbytes EXPR ",
+        "link": "https://metacpan.org/pod/perlfunc#evalbytes-EXPR"
+    },
+    {
+        "name": "evalbytes",
+        "link": "https://metacpan.org/pod/perlfunc#evalbytes1"
+    },
+    {
+        "name": "exec LIST  ",
+        "link": "https://metacpan.org/pod/perlfunc#exec-LIST"
+    },
+    {
+        "name": "exec PROGRAM LIST",
+        "link": "https://metacpan.org/pod/perlfunc#exec-PROGRAM-LIST"
+    },
+    {
+        "name": "exists EXPR  ",
+        "link": "https://metacpan.org/pod/perlfunc#exists-EXPR"
+    },
+    {
+        "name": "exit EXPR   ",
+        "link": "https://metacpan.org/pod/perlfunc#exit-EXPR"
+    },
+    {
+        "name": "exit",
+        "link": "https://metacpan.org/pod/perlfunc#exit1"
+    },
+    {
+        "name": "exp EXPR     ",
+        "link": "https://metacpan.org/pod/perlfunc#exp-EXPR"
+    },
+    {
+        "name": "exp",
+        "link": "https://metacpan.org/pod/perlfunc#exp1"
+    },
+    {
+        "name": "fc EXPR     ",
+        "link": "https://metacpan.org/pod/perlfunc#fc-EXPR"
+    },
+    {
+        "name": "fc",
+        "link": "https://metacpan.org/pod/perlfunc#fc1"
+    },
+    {
+        "name": "fcntl FILEHANDLE,FUNCTION,SCALAR ",
+        "link": "https://metacpan.org/pod/perlfunc#fcntl-FILEHANDLE,FUNCTION,SCALAR"
+    },
+    {
+        "name": "__FILE__ ",
+        "link": "https://metacpan.org/pod/perlfunc#__FILE__"
+    },
+    {
+        "name": "fileno FILEHANDLE ",
+        "link": "https://metacpan.org/pod/perlfunc#fileno-FILEHANDLE"
+    },
+    {
+        "name": "fileno DIRHANDLE",
+        "link": "https://metacpan.org/pod/perlfunc#fileno-DIRHANDLE"
+    },
+    {
+        "name": "flock FILEHANDLE,OPERATION   ",
+        "link": "https://metacpan.org/pod/perlfunc#flock-FILEHANDLE,OPERATION"
+    },
+    {
+        "name": "fork   ",
+        "link": "https://metacpan.org/pod/perlfunc#fork"
+    },
+    {
+        "name": "format ",
+        "link": "https://metacpan.org/pod/perlfunc#format"
+    },
+    {
+        "name": "formline PICTURE,LIST ",
+        "link": "https://metacpan.org/pod/perlfunc#formline-PICTURE,LIST"
+    },
+    {
+        "name": "getc FILEHANDLE    ",
+        "link": "https://metacpan.org/pod/perlfunc#getc-FILEHANDLE"
+    },
+    {
+        "name": "getc",
+        "link": "https://metacpan.org/pod/perlfunc#getc1"
+    },
+    {
+        "name": "getlogin  ",
+        "link": "https://metacpan.org/pod/perlfunc#getlogin"
+    },
+    {
+        "name": "getpeername SOCKET  ",
+        "link": "https://metacpan.org/pod/perlfunc#getpeername-SOCKET"
+    },
+    {
+        "name": "getpgrp PID  ",
+        "link": "https://metacpan.org/pod/perlfunc#getpgrp-PID"
+    },
+    {
+        "name": "getppid   ",
+        "link": "https://metacpan.org/pod/perlfunc#getppid"
+    },
+    {
+        "name": "getpriority WHICH,WHO   ",
+        "link": "https://metacpan.org/pod/perlfunc#getpriority-WHICH,WHO"
+    },
+    {
+        "name": "getpwnam NAME                              ",
+        "link": "https://metacpan.org/pod/perlfunc#getpwnam-NAME"
+    },
+    {
+        "name": "getgrnam NAME",
+        "link": "https://metacpan.org/pod/perlfunc#getgrnam-NAME"
+    },
+    {
+        "name": "gethostbyname NAME",
+        "link": "https://metacpan.org/pod/perlfunc#gethostbyname-NAME"
+    },
+    {
+        "name": "getnetbyname NAME",
+        "link": "https://metacpan.org/pod/perlfunc#getnetbyname-NAME"
+    },
+    {
+        "name": "getprotobyname NAME",
+        "link": "https://metacpan.org/pod/perlfunc#getprotobyname-NAME"
+    },
+    {
+        "name": "getpwuid UID",
+        "link": "https://metacpan.org/pod/perlfunc#getpwuid-UID"
+    },
+    {
+        "name": "getgrgid GID",
+        "link": "https://metacpan.org/pod/perlfunc#getgrgid-GID"
+    },
+    {
+        "name": "getservbyname NAME,PROTO",
+        "link": "https://metacpan.org/pod/perlfunc#getservbyname-NAME,PROTO"
+    },
+    {
+        "name": "gethostbyaddr ADDR,ADDRTYPE",
+        "link": "https://metacpan.org/pod/perlfunc#gethostbyaddr-ADDR,ADDRTYPE"
+    },
+    {
+        "name": "getnetbyaddr ADDR,ADDRTYPE",
+        "link": "https://metacpan.org/pod/perlfunc#getnetbyaddr-ADDR,ADDRTYPE"
+    },
+    {
+        "name": "getprotobynumber NUMBER",
+        "link": "https://metacpan.org/pod/perlfunc#getprotobynumber-NUMBER"
+    },
+    {
+        "name": "getservbyport PORT,PROTO",
+        "link": "https://metacpan.org/pod/perlfunc#getservbyport-PORT,PROTO"
+    },
+    {
+        "name": "getpwent",
+        "link": "https://metacpan.org/pod/perlfunc#getpwent"
+    },
+    {
+        "name": "getgrent",
+        "link": "https://metacpan.org/pod/perlfunc#getgrent"
+    },
+    {
+        "name": "gethostent",
+        "link": "https://metacpan.org/pod/perlfunc#gethostent"
+    },
+    {
+        "name": "getnetent",
+        "link": "https://metacpan.org/pod/perlfunc#getnetent"
+    },
+    {
+        "name": "getprotoent",
+        "link": "https://metacpan.org/pod/perlfunc#getprotoent"
+    },
+    {
+        "name": "getservent",
+        "link": "https://metacpan.org/pod/perlfunc#getservent"
+    },
+    {
+        "name": "setpwent",
+        "link": "https://metacpan.org/pod/perlfunc#setpwent"
+    },
+    {
+        "name": "setgrent",
+        "link": "https://metacpan.org/pod/perlfunc#setgrent"
+    },
+    {
+        "name": "sethostent STAYOPEN",
+        "link": "https://metacpan.org/pod/perlfunc#sethostent-STAYOPEN"
+    },
+    {
+        "name": "setnetent STAYOPEN",
+        "link": "https://metacpan.org/pod/perlfunc#setnetent-STAYOPEN"
+    },
+    {
+        "name": "setprotoent STAYOPEN",
+        "link": "https://metacpan.org/pod/perlfunc#setprotoent-STAYOPEN"
+    },
+    {
+        "name": "setservent STAYOPEN",
+        "link": "https://metacpan.org/pod/perlfunc#setservent-STAYOPEN"
+    },
+    {
+        "name": "endpwent",
+        "link": "https://metacpan.org/pod/perlfunc#endpwent"
+    },
+    {
+        "name": "endgrent",
+        "link": "https://metacpan.org/pod/perlfunc#endgrent"
+    },
+    {
+        "name": "endhostent",
+        "link": "https://metacpan.org/pod/perlfunc#endhostent"
+    },
+    {
+        "name": "endnetent",
+        "link": "https://metacpan.org/pod/perlfunc#endnetent"
+    },
+    {
+        "name": "endprotoent",
+        "link": "https://metacpan.org/pod/perlfunc#endprotoent"
+    },
+    {
+        "name": "endservent",
+        "link": "https://metacpan.org/pod/perlfunc#endservent"
+    },
+    {
+        "name": "getsockname SOCKET ",
+        "link": "https://metacpan.org/pod/perlfunc#getsockname-SOCKET"
+    },
+    {
+        "name": "getsockopt SOCKET,LEVEL,OPTNAME ",
+        "link": "https://metacpan.org/pod/perlfunc#getsockopt-SOCKET,LEVEL,OPTNAME"
+    },
+    {
+        "name": "glob EXPR    ",
+        "link": "https://metacpan.org/pod/perlfunc#glob-EXPR"
+    },
+    {
+        "name": "glob",
+        "link": "https://metacpan.org/pod/perlfunc#glob1"
+    },
+    {
+        "name": "gmtime EXPR   ",
+        "link": "https://metacpan.org/pod/perlfunc#gmtime-EXPR"
+    },
+    {
+        "name": "gmtime",
+        "link": "https://metacpan.org/pod/perlfunc#gmtime1"
+    },
+    {
+        "name": "goto LABEL   ",
+        "link": "https://metacpan.org/pod/perlfunc#goto-LABEL"
+    },
+    {
+        "name": "goto EXPR",
+        "link": "https://metacpan.org/pod/perlfunc#goto-EXPR"
+    },
+    {
+        "name": "goto &NAME",
+        "link": "https://metacpan.org/pod/perlfunc#goto-&NAME"
+    },
+    {
+        "name": "grep BLOCK LIST ",
+        "link": "https://metacpan.org/pod/perlfunc#grep-BLOCK-LIST"
+    },
+    {
+        "name": "grep EXPR,LIST",
+        "link": "https://metacpan.org/pod/perlfunc#grep-EXPR,LIST"
+    },
+    {
+        "name": "hex EXPR  ",
+        "link": "https://metacpan.org/pod/perlfunc#hex-EXPR"
+    },
+    {
+        "name": "hex",
+        "link": "https://metacpan.org/pod/perlfunc#hex1"
+    },
+    {
+        "name": "import LIST ",
+        "link": "https://metacpan.org/pod/perlfunc#import-LIST"
+    },
+    {
+        "name": "index STR,SUBSTR,POSITION   ",
+        "link": "https://metacpan.org/pod/perlfunc#index-STR,SUBSTR,POSITION"
+    },
+    {
+        "name": "index STR,SUBSTR",
+        "link": "https://metacpan.org/pod/perlfunc#index-STR,SUBSTR"
+    },
+    {
+        "name": "int EXPR     ",
+        "link": "https://metacpan.org/pod/perlfunc#int-EXPR"
+    },
+    {
+        "name": "int",
+        "link": "https://metacpan.org/pod/perlfunc#int1"
+    },
+    {
+        "name": "ioctl FILEHANDLE,FUNCTION,SCALAR ",
+        "link": "https://metacpan.org/pod/perlfunc#ioctl-FILEHANDLE,FUNCTION,SCALAR"
+    },
+    {
+        "name": "join EXPR,LIST ",
+        "link": "https://metacpan.org/pod/perlfunc#join-EXPR,LIST"
+    },
+    {
+        "name": "keys HASH  ",
+        "link": "https://metacpan.org/pod/perlfunc#keys-HASH"
+    },
+    {
+        "name": "keys ARRAY",
+        "link": "https://metacpan.org/pod/perlfunc#keys-ARRAY"
+    },
+    {
+        "name": "kill SIGNAL, LIST",
+        "link": "https://metacpan.org/pod/perlfunc#kill-SIGNAL,-LIST"
+    },
+    {
+        "name": "kill SIGNAL  ",
+        "link": "https://metacpan.org/pod/perlfunc#kill-SIGNAL"
+    },
+    {
+        "name": "last LABEL  ",
+        "link": "https://metacpan.org/pod/perlfunc#last-LABEL"
+    },
+    {
+        "name": "last EXPR",
+        "link": "https://metacpan.org/pod/perlfunc#last-EXPR"
+    },
+    {
+        "name": "last",
+        "link": "https://metacpan.org/pod/perlfunc#last2"
+    },
+    {
+        "name": "lc EXPR  ",
+        "link": "https://metacpan.org/pod/perlfunc#lc-EXPR"
+    },
+    {
+        "name": "lc",
+        "link": "https://metacpan.org/pod/perlfunc#lc1"
+    },
+    {
+        "name": "lcfirst EXPR  ",
+        "link": "https://metacpan.org/pod/perlfunc#lcfirst-EXPR"
+    },
+    {
+        "name": "lcfirst",
+        "link": "https://metacpan.org/pod/perlfunc#lcfirst1"
+    },
+    {
+        "name": "length EXPR  ",
+        "link": "https://metacpan.org/pod/perlfunc#length-EXPR"
+    },
+    {
+        "name": "length",
+        "link": "https://metacpan.org/pod/perlfunc#length1"
+    },
+    {
+        "name": "__LINE__ ",
+        "link": "https://metacpan.org/pod/perlfunc#__LINE__"
+    },
+    {
+        "name": "link OLDFILE,NEWFILE ",
+        "link": "https://metacpan.org/pod/perlfunc#link-OLDFILE,NEWFILE"
+    },
+    {
+        "name": "listen SOCKET,QUEUESIZE ",
+        "link": "https://metacpan.org/pod/perlfunc#listen-SOCKET,QUEUESIZE"
+    },
+    {
+        "name": "local EXPR ",
+        "link": "https://metacpan.org/pod/perlfunc#local-EXPR"
+    },
+    {
+        "name": "localtime EXPR  ",
+        "link": "https://metacpan.org/pod/perlfunc#localtime-EXPR"
+    },
+    {
+        "name": "localtime",
+        "link": "https://metacpan.org/pod/perlfunc#localtime1"
+    },
+    {
+        "name": "lock THING ",
+        "link": "https://metacpan.org/pod/perlfunc#lock-THING"
+    },
+    {
+        "name": "log EXPR     ",
+        "link": "https://metacpan.org/pod/perlfunc#log-EXPR"
+    },
+    {
+        "name": "log",
+        "link": "https://metacpan.org/pod/perlfunc#log1"
+    },
+    {
+        "name": "lstat FILEHANDLE ",
+        "link": "https://metacpan.org/pod/perlfunc#lstat-FILEHANDLE"
+    },
+    {
+        "name": "lstat EXPR",
+        "link": "https://metacpan.org/pod/perlfunc#lstat-EXPR"
+    },
+    {
+        "name": "lstat DIRHANDLE",
+        "link": "https://metacpan.org/pod/perlfunc#lstat-DIRHANDLE"
+    },
+    {
+        "name": "lstat",
+        "link": "https://metacpan.org/pod/perlfunc#lstat3"
+    },
+    {
+        "name": "m//",
+        "link": "https://metacpan.org/pod/perlfunc#m//"
+    },
+    {
+        "name": "map BLOCK LIST ",
+        "link": "https://metacpan.org/pod/perlfunc#map-BLOCK-LIST"
+    },
+    {
+        "name": "map EXPR,LIST",
+        "link": "https://metacpan.org/pod/perlfunc#map-EXPR,LIST"
+    },
+    {
+        "name": "mkdir FILENAME,MODE   ",
+        "link": "https://metacpan.org/pod/perlfunc#mkdir-FILENAME,MODE"
+    },
+    {
+        "name": "mkdir FILENAME",
+        "link": "https://metacpan.org/pod/perlfunc#mkdir-FILENAME"
+    },
+    {
+        "name": "mkdir",
+        "link": "https://metacpan.org/pod/perlfunc#mkdir2"
+    },
+    {
+        "name": "msgctl ID,CMD,ARG ",
+        "link": "https://metacpan.org/pod/perlfunc#msgctl-ID,CMD,ARG"
+    },
+    {
+        "name": "msgget KEY,FLAGS ",
+        "link": "https://metacpan.org/pod/perlfunc#msgget-KEY,FLAGS"
+    },
+    {
+        "name": "msgrcv ID,VAR,SIZE,TYPE,FLAGS ",
+        "link": "https://metacpan.org/pod/perlfunc#msgrcv-ID,VAR,SIZE,TYPE,FLAGS"
+    },
+    {
+        "name": "msgsnd ID,MSG,FLAGS ",
+        "link": "https://metacpan.org/pod/perlfunc#msgsnd-ID,MSG,FLAGS"
+    },
+    {
+        "name": "my VARLIST ",
+        "link": "https://metacpan.org/pod/perlfunc#my-VARLIST"
+    },
+    {
+        "name": "my TYPE VARLIST",
+        "link": "https://metacpan.org/pod/perlfunc#my-TYPE-VARLIST"
+    },
+    {
+        "name": "my VARLIST : ATTRS",
+        "link": "https://metacpan.org/pod/perlfunc#my-VARLIST-:-ATTRS"
+    },
+    {
+        "name": "my TYPE VARLIST : ATTRS",
+        "link": "https://metacpan.org/pod/perlfunc#my-TYPE-VARLIST-:-ATTRS"
+    },
+    {
+        "name": "next LABEL  ",
+        "link": "https://metacpan.org/pod/perlfunc#next-LABEL"
+    },
+    {
+        "name": "next EXPR",
+        "link": "https://metacpan.org/pod/perlfunc#next-EXPR"
+    },
+    {
+        "name": "next",
+        "link": "https://metacpan.org/pod/perlfunc#next2"
+    },
+    {
+        "name": "no MODULE VERSION LIST  ",
+        "link": "https://metacpan.org/pod/perlfunc#no-MODULE-VERSION-LIST"
+    },
+    {
+        "name": "no MODULE VERSION",
+        "link": "https://metacpan.org/pod/perlfunc#no-MODULE-VERSION"
+    },
+    {
+        "name": "no MODULE LIST",
+        "link": "https://metacpan.org/pod/perlfunc#no-MODULE-LIST"
+    },
+    {
+        "name": "no MODULE",
+        "link": "https://metacpan.org/pod/perlfunc#no-MODULE"
+    },
+    {
+        "name": "no VERSION",
+        "link": "https://metacpan.org/pod/perlfunc#no-VERSION"
+    },
+    {
+        "name": "oct EXPR      ",
+        "link": "https://metacpan.org/pod/perlfunc#oct-EXPR"
+    },
+    {
+        "name": "oct",
+        "link": "https://metacpan.org/pod/perlfunc#oct1"
+    },
+    {
+        "name": "open FILEHANDLE,MODE,EXPR    ",
+        "link": "https://metacpan.org/pod/perlfunc#open-FILEHANDLE,MODE,EXPR"
+    },
+    {
+        "name": "open FILEHANDLE,MODE,EXPR,LIST",
+        "link": "https://metacpan.org/pod/perlfunc#open-FILEHANDLE,MODE,EXPR,LIST"
+    },
+    {
+        "name": "open FILEHANDLE,MODE,REFERENCE",
+        "link": "https://metacpan.org/pod/perlfunc#open-FILEHANDLE,MODE,REFERENCE"
+    },
+    {
+        "name": "open FILEHANDLE,EXPR",
+        "link": "https://metacpan.org/pod/perlfunc#open-FILEHANDLE,EXPR"
+    },
+    {
+        "name": "open FILEHANDLE",
+        "link": "https://metacpan.org/pod/perlfunc#open-FILEHANDLE"
+    },
+    {
+        "name": "opendir DIRHANDLE,EXPR ",
+        "link": "https://metacpan.org/pod/perlfunc#opendir-DIRHANDLE,EXPR"
+    },
+    {
+        "name": "ord EXPR  ",
+        "link": "https://metacpan.org/pod/perlfunc#ord-EXPR"
+    },
+    {
+        "name": "ord",
+        "link": "https://metacpan.org/pod/perlfunc#ord1"
+    },
+    {
+        "name": "our VARLIST  ",
+        "link": "https://metacpan.org/pod/perlfunc#our-VARLIST"
+    },
+    {
+        "name": "our TYPE VARLIST",
+        "link": "https://metacpan.org/pod/perlfunc#our-TYPE-VARLIST"
+    },
+    {
+        "name": "our VARLIST : ATTRS",
+        "link": "https://metacpan.org/pod/perlfunc#our-VARLIST-:-ATTRS"
+    },
+    {
+        "name": "our TYPE VARLIST : ATTRS",
+        "link": "https://metacpan.org/pod/perlfunc#our-TYPE-VARLIST-:-ATTRS"
+    },
+    {
+        "name": "pack TEMPLATE,LIST ",
+        "link": "https://metacpan.org/pod/perlfunc#pack-TEMPLATE,LIST"
+    },
+    {
+        "name": "package NAMESPACE",
+        "link": "https://metacpan.org/pod/perlfunc#package-NAMESPACE"
+    },
+    {
+        "name": "package NAMESPACE VERSION    ",
+        "link": "https://metacpan.org/pod/perlfunc#package-NAMESPACE-VERSION"
+    },
+    {
+        "name": "package NAMESPACE BLOCK",
+        "link": "https://metacpan.org/pod/perlfunc#package-NAMESPACE-BLOCK"
+    },
+    {
+        "name": "package NAMESPACE VERSION BLOCK    ",
+        "link": "https://metacpan.org/pod/perlfunc#package-NAMESPACE-VERSION-BLOCK"
+    },
+    {
+        "name": "__PACKAGE__ ",
+        "link": "https://metacpan.org/pod/perlfunc#__PACKAGE__"
+    },
+    {
+        "name": "pipe READHANDLE,WRITEHANDLE ",
+        "link": "https://metacpan.org/pod/perlfunc#pipe-READHANDLE,WRITEHANDLE"
+    },
+    {
+        "name": "pop ARRAY  ",
+        "link": "https://metacpan.org/pod/perlfunc#pop-ARRAY"
+    },
+    {
+        "name": "pop",
+        "link": "https://metacpan.org/pod/perlfunc#pop1"
+    },
+    {
+        "name": "pos SCALAR  ",
+        "link": "https://metacpan.org/pod/perlfunc#pos-SCALAR"
+    },
+    {
+        "name": "pos",
+        "link": "https://metacpan.org/pod/perlfunc#pos1"
+    },
+    {
+        "name": "print FILEHANDLE LIST ",
+        "link": "https://metacpan.org/pod/perlfunc#print-FILEHANDLE-LIST"
+    },
+    {
+        "name": "print FILEHANDLE",
+        "link": "https://metacpan.org/pod/perlfunc#print-FILEHANDLE"
+    },
+    {
+        "name": "print LIST",
+        "link": "https://metacpan.org/pod/perlfunc#print-LIST"
+    },
+    {
+        "name": "print",
+        "link": "https://metacpan.org/pod/perlfunc#print3"
+    },
+    {
+        "name": "printf FILEHANDLE FORMAT, LIST ",
+        "link": "https://metacpan.org/pod/perlfunc#printf-FILEHANDLE-FORMAT,-LIST"
+    },
+    {
+        "name": "printf FILEHANDLE",
+        "link": "https://metacpan.org/pod/perlfunc#printf-FILEHANDLE"
+    },
+    {
+        "name": "printf FORMAT, LIST",
+        "link": "https://metacpan.org/pod/perlfunc#printf-FORMAT,-LIST"
+    },
+    {
+        "name": "printf",
+        "link": "https://metacpan.org/pod/perlfunc#printf3"
+    },
+    {
+        "name": "prototype FUNCTION ",
+        "link": "https://metacpan.org/pod/perlfunc#prototype-FUNCTION"
+    },
+    {
+        "name": "prototype",
+        "link": "https://metacpan.org/pod/perlfunc#prototype1"
+    },
+    {
+        "name": "push ARRAY,LIST  ",
+        "link": "https://metacpan.org/pod/perlfunc#push-ARRAY,LIST"
+    },
+    {
+        "name": "q/STRING/",
+        "link": "https://metacpan.org/pod/perlfunc#q/STRING/"
+    },
+    {
+        "name": "qq/STRING/",
+        "link": "https://metacpan.org/pod/perlfunc#qq/STRING/"
+    },
+    {
+        "name": "qw/STRING/",
+        "link": "https://metacpan.org/pod/perlfunc#qw/STRING/"
+    },
+    {
+        "name": "qx/STRING/",
+        "link": "https://metacpan.org/pod/perlfunc#qx/STRING/"
+    },
+    {
+        "name": "qr/STRING/",
+        "link": "https://metacpan.org/pod/perlfunc#qr/STRING/"
+    },
+    {
+        "name": "quotemeta EXPR  ",
+        "link": "https://metacpan.org/pod/perlfunc#quotemeta-EXPR"
+    },
+    {
+        "name": "quotemeta",
+        "link": "https://metacpan.org/pod/perlfunc#quotemeta1"
+    },
+    {
+        "name": "rand EXPR  ",
+        "link": "https://metacpan.org/pod/perlfunc#rand-EXPR"
+    },
+    {
+        "name": "rand",
+        "link": "https://metacpan.org/pod/perlfunc#rand1"
+    },
+    {
+        "name": "read FILEHANDLE,SCALAR,LENGTH,OFFSET  ",
+        "link": "https://metacpan.org/pod/perlfunc#read-FILEHANDLE,SCALAR,LENGTH,OFFSET"
+    },
+    {
+        "name": "read FILEHANDLE,SCALAR,LENGTH",
+        "link": "https://metacpan.org/pod/perlfunc#read-FILEHANDLE,SCALAR,LENGTH"
+    },
+    {
+        "name": "readdir DIRHANDLE ",
+        "link": "https://metacpan.org/pod/perlfunc#readdir-DIRHANDLE"
+    },
+    {
+        "name": "readline EXPR",
+        "link": "https://metacpan.org/pod/perlfunc#readline-EXPR"
+    },
+    {
+        "name": "readline   ",
+        "link": "https://metacpan.org/pod/perlfunc#readline1"
+    },
+    {
+        "name": "readlink EXPR ",
+        "link": "https://metacpan.org/pod/perlfunc#readlink-EXPR"
+    },
+    {
+        "name": "readlink",
+        "link": "https://metacpan.org/pod/perlfunc#readlink1"
+    },
+    {
+        "name": "readpipe EXPR",
+        "link": "https://metacpan.org/pod/perlfunc#readpipe-EXPR"
+    },
+    {
+        "name": "readpipe ",
+        "link": "https://metacpan.org/pod/perlfunc#readpipe1"
+    },
+    {
+        "name": "recv SOCKET,SCALAR,LENGTH,FLAGS ",
+        "link": "https://metacpan.org/pod/perlfunc#recv-SOCKET,SCALAR,LENGTH,FLAGS"
+    },
+    {
+        "name": "redo LABEL ",
+        "link": "https://metacpan.org/pod/perlfunc#redo-LABEL"
+    },
+    {
+        "name": "redo EXPR",
+        "link": "https://metacpan.org/pod/perlfunc#redo-EXPR"
+    },
+    {
+        "name": "redo",
+        "link": "https://metacpan.org/pod/perlfunc#redo2"
+    },
+    {
+        "name": "ref EXPR  ",
+        "link": "https://metacpan.org/pod/perlfunc#ref-EXPR"
+    },
+    {
+        "name": "ref",
+        "link": "https://metacpan.org/pod/perlfunc#ref1"
+    },
+    {
+        "name": "rename OLDNAME,NEWNAME    ",
+        "link": "https://metacpan.org/pod/perlfunc#rename-OLDNAME,NEWNAME"
+    },
+    {
+        "name": "require VERSION ",
+        "link": "https://metacpan.org/pod/perlfunc#require-VERSION"
+    },
+    {
+        "name": "require EXPR",
+        "link": "https://metacpan.org/pod/perlfunc#require-EXPR"
+    },
+    {
+        "name": "require",
+        "link": "https://metacpan.org/pod/perlfunc#require2"
+    },
+    {
+        "name": "reset EXPR ",
+        "link": "https://metacpan.org/pod/perlfunc#reset-EXPR"
+    },
+    {
+        "name": "reset",
+        "link": "https://metacpan.org/pod/perlfunc#reset1"
+    },
+    {
+        "name": "return EXPR ",
+        "link": "https://metacpan.org/pod/perlfunc#return-EXPR"
+    },
+    {
+        "name": "return",
+        "link": "https://metacpan.org/pod/perlfunc#return1"
+    },
+    {
+        "name": "reverse LIST   ",
+        "link": "https://metacpan.org/pod/perlfunc#reverse-LIST"
+    },
+    {
+        "name": "rewinddir DIRHANDLE ",
+        "link": "https://metacpan.org/pod/perlfunc#rewinddir-DIRHANDLE"
+    },
+    {
+        "name": "rindex STR,SUBSTR,POSITION ",
+        "link": "https://metacpan.org/pod/perlfunc#rindex-STR,SUBSTR,POSITION"
+    },
+    {
+        "name": "rindex STR,SUBSTR",
+        "link": "https://metacpan.org/pod/perlfunc#rindex-STR,SUBSTR"
+    },
+    {
+        "name": "rmdir FILENAME   ",
+        "link": "https://metacpan.org/pod/perlfunc#rmdir-FILENAME"
+    },
+    {
+        "name": "rmdir",
+        "link": "https://metacpan.org/pod/perlfunc#rmdir1"
+    },
+    {
+        "name": "s///",
+        "link": "https://metacpan.org/pod/perlfunc#s///"
+    },
+    {
+        "name": "say FILEHANDLE LIST ",
+        "link": "https://metacpan.org/pod/perlfunc#say-FILEHANDLE-LIST"
+    },
+    {
+        "name": "say FILEHANDLE",
+        "link": "https://metacpan.org/pod/perlfunc#say-FILEHANDLE"
+    },
+    {
+        "name": "say LIST",
+        "link": "https://metacpan.org/pod/perlfunc#say-LIST"
+    },
+    {
+        "name": "say",
+        "link": "https://metacpan.org/pod/perlfunc#say3"
+    },
+    {
+        "name": "scalar EXPR  ",
+        "link": "https://metacpan.org/pod/perlfunc#scalar-EXPR"
+    },
+    {
+        "name": "seek FILEHANDLE,POSITION,WHENCE   ",
+        "link": "https://metacpan.org/pod/perlfunc#seek-FILEHANDLE,POSITION,WHENCE"
+    },
+    {
+        "name": "seekdir DIRHANDLE,POS ",
+        "link": "https://metacpan.org/pod/perlfunc#seekdir-DIRHANDLE,POS"
+    },
+    {
+        "name": "select FILEHANDLE  ",
+        "link": "https://metacpan.org/pod/perlfunc#select-FILEHANDLE"
+    },
+    {
+        "name": "select",
+        "link": "https://metacpan.org/pod/perlfunc#select1"
+    },
+    {
+        "name": "select RBITS,WBITS,EBITS,TIMEOUT ",
+        "link": "https://metacpan.org/pod/perlfunc#select-RBITS,WBITS,EBITS,TIMEOUT"
+    },
+    {
+        "name": "semctl ID,SEMNUM,CMD,ARG ",
+        "link": "https://metacpan.org/pod/perlfunc#semctl-ID,SEMNUM,CMD,ARG"
+    },
+    {
+        "name": "semget KEY,NSEMS,FLAGS ",
+        "link": "https://metacpan.org/pod/perlfunc#semget-KEY,NSEMS,FLAGS"
+    },
+    {
+        "name": "semop KEY,OPSTRING ",
+        "link": "https://metacpan.org/pod/perlfunc#semop-KEY,OPSTRING"
+    },
+    {
+        "name": "send SOCKET,MSG,FLAGS,TO ",
+        "link": "https://metacpan.org/pod/perlfunc#send-SOCKET,MSG,FLAGS,TO"
+    },
+    {
+        "name": "send SOCKET,MSG,FLAGS",
+        "link": "https://metacpan.org/pod/perlfunc#send-SOCKET,MSG,FLAGS"
+    },
+    {
+        "name": "setpgrp PID,PGRP  ",
+        "link": "https://metacpan.org/pod/perlfunc#setpgrp-PID,PGRP"
+    },
+    {
+        "name": "setpriority WHICH,WHO,PRIORITY    ",
+        "link": "https://metacpan.org/pod/perlfunc#setpriority-WHICH,WHO,PRIORITY"
+    },
+    {
+        "name": "setsockopt SOCKET,LEVEL,OPTNAME,OPTVAL ",
+        "link": "https://metacpan.org/pod/perlfunc#setsockopt-SOCKET,LEVEL,OPTNAME,OPTVAL"
+    },
+    {
+        "name": "shift ARRAY ",
+        "link": "https://metacpan.org/pod/perlfunc#shift-ARRAY"
+    },
+    {
+        "name": "shift",
+        "link": "https://metacpan.org/pod/perlfunc#shift1"
+    },
+    {
+        "name": "shmctl ID,CMD,ARG ",
+        "link": "https://metacpan.org/pod/perlfunc#shmctl-ID,CMD,ARG"
+    },
+    {
+        "name": "shmget KEY,SIZE,FLAGS ",
+        "link": "https://metacpan.org/pod/perlfunc#shmget-KEY,SIZE,FLAGS"
+    },
+    {
+        "name": "shmread ID,VAR,POS,SIZE  ",
+        "link": "https://metacpan.org/pod/perlfunc#shmread-ID,VAR,POS,SIZE"
+    },
+    {
+        "name": "shmwrite ID,STRING,POS,SIZE",
+        "link": "https://metacpan.org/pod/perlfunc#shmwrite-ID,STRING,POS,SIZE"
+    },
+    {
+        "name": "shutdown SOCKET,HOW ",
+        "link": "https://metacpan.org/pod/perlfunc#shutdown-SOCKET,HOW"
+    },
+    {
+        "name": "sin EXPR    ",
+        "link": "https://metacpan.org/pod/perlfunc#sin-EXPR"
+    },
+    {
+        "name": "sin",
+        "link": "https://metacpan.org/pod/perlfunc#sin1"
+    },
+    {
+        "name": "sleep EXPR  ",
+        "link": "https://metacpan.org/pod/perlfunc#sleep-EXPR"
+    },
+    {
+        "name": "sleep",
+        "link": "https://metacpan.org/pod/perlfunc#sleep1"
+    },
+    {
+        "name": "socket SOCKET,DOMAIN,TYPE,PROTOCOL ",
+        "link": "https://metacpan.org/pod/perlfunc#socket-SOCKET,DOMAIN,TYPE,PROTOCOL"
+    },
+    {
+        "name": "socketpair SOCKET1,SOCKET2,DOMAIN,TYPE,PROTOCOL ",
+        "link": "https://metacpan.org/pod/perlfunc#socketpair-SOCKET1,SOCKET2,DOMAIN,TYPE,PROTOCOL"
+    },
+    {
+        "name": "sort SUBNAME LIST ",
+        "link": "https://metacpan.org/pod/perlfunc#sort-SUBNAME-LIST"
+    },
+    {
+        "name": "sort BLOCK LIST",
+        "link": "https://metacpan.org/pod/perlfunc#sort-BLOCK-LIST"
+    },
+    {
+        "name": "sort LIST",
+        "link": "https://metacpan.org/pod/perlfunc#sort-LIST"
+    },
+    {
+        "name": "splice ARRAY,OFFSET,LENGTH,LIST ",
+        "link": "https://metacpan.org/pod/perlfunc#splice-ARRAY,OFFSET,LENGTH,LIST"
+    },
+    {
+        "name": "splice ARRAY,OFFSET,LENGTH",
+        "link": "https://metacpan.org/pod/perlfunc#splice-ARRAY,OFFSET,LENGTH"
+    },
+    {
+        "name": "splice ARRAY,OFFSET",
+        "link": "https://metacpan.org/pod/perlfunc#splice-ARRAY,OFFSET"
+    },
+    {
+        "name": "splice ARRAY",
+        "link": "https://metacpan.org/pod/perlfunc#splice-ARRAY"
+    },
+    {
+        "name": "split /PATTERN/,EXPR,LIMIT ",
+        "link": "https://metacpan.org/pod/perlfunc#split-/PATTERN/,EXPR,LIMIT"
+    },
+    {
+        "name": "split /PATTERN/,EXPR",
+        "link": "https://metacpan.org/pod/perlfunc#split-/PATTERN/,EXPR"
+    },
+    {
+        "name": "split /PATTERN/",
+        "link": "https://metacpan.org/pod/perlfunc#split-/PATTERN/"
+    },
+    {
+        "name": "split",
+        "link": "https://metacpan.org/pod/perlfunc#split3"
+    },
+    {
+        "name": "sprintf FORMAT, LIST ",
+        "link": "https://metacpan.org/pod/perlfunc#sprintf-FORMAT,-LIST"
+    },
+    {
+        "name": "sqrt EXPR   ",
+        "link": "https://metacpan.org/pod/perlfunc#sqrt-EXPR"
+    },
+    {
+        "name": "sqrt",
+        "link": "https://metacpan.org/pod/perlfunc#sqrt1"
+    },
+    {
+        "name": "srand EXPR   ",
+        "link": "https://metacpan.org/pod/perlfunc#srand-EXPR"
+    },
+    {
+        "name": "srand",
+        "link": "https://metacpan.org/pod/perlfunc#srand1"
+    },
+    {
+        "name": "stat FILEHANDLE   ",
+        "link": "https://metacpan.org/pod/perlfunc#stat-FILEHANDLE"
+    },
+    {
+        "name": "stat EXPR",
+        "link": "https://metacpan.org/pod/perlfunc#stat-EXPR"
+    },
+    {
+        "name": "stat DIRHANDLE",
+        "link": "https://metacpan.org/pod/perlfunc#stat-DIRHANDLE"
+    },
+    {
+        "name": "stat",
+        "link": "https://metacpan.org/pod/perlfunc#stat3"
+    },
+    {
+        "name": "state VARLIST ",
+        "link": "https://metacpan.org/pod/perlfunc#state-VARLIST"
+    },
+    {
+        "name": "state TYPE VARLIST",
+        "link": "https://metacpan.org/pod/perlfunc#state-TYPE-VARLIST"
+    },
+    {
+        "name": "state VARLIST : ATTRS",
+        "link": "https://metacpan.org/pod/perlfunc#state-VARLIST-:-ATTRS"
+    },
+    {
+        "name": "state TYPE VARLIST : ATTRS",
+        "link": "https://metacpan.org/pod/perlfunc#state-TYPE-VARLIST-:-ATTRS"
+    },
+    {
+        "name": "study SCALAR ",
+        "link": "https://metacpan.org/pod/perlfunc#study-SCALAR"
+    },
+    {
+        "name": "study",
+        "link": "https://metacpan.org/pod/perlfunc#study1"
+    },
+    {
+        "name": "sub NAME BLOCK ",
+        "link": "https://metacpan.org/pod/perlfunc#sub-NAME-BLOCK"
+    },
+    {
+        "name": "sub NAME (PROTO) BLOCK",
+        "link": "https://metacpan.org/pod/perlfunc#sub-NAME-(PROTO)-BLOCK"
+    },
+    {
+        "name": "sub NAME : ATTRS BLOCK",
+        "link": "https://metacpan.org/pod/perlfunc#sub-NAME-:-ATTRS-BLOCK"
+    },
+    {
+        "name": "sub NAME (PROTO) : ATTRS BLOCK",
+        "link": "https://metacpan.org/pod/perlfunc#sub-NAME-(PROTO)-:-ATTRS-BLOCK"
+    },
+    {
+        "name": "__SUB__ ",
+        "link": "https://metacpan.org/pod/perlfunc#__SUB__"
+    },
+    {
+        "name": "substr EXPR,OFFSET,LENGTH,REPLACEMENT     ",
+        "link": "https://metacpan.org/pod/perlfunc#substr-EXPR,OFFSET,LENGTH,REPLACEMENT"
+    },
+    {
+        "name": "substr EXPR,OFFSET,LENGTH",
+        "link": "https://metacpan.org/pod/perlfunc#substr-EXPR,OFFSET,LENGTH"
+    },
+    {
+        "name": "substr EXPR,OFFSET",
+        "link": "https://metacpan.org/pod/perlfunc#substr-EXPR,OFFSET"
+    },
+    {
+        "name": "symlink OLDFILE,NEWFILE    ",
+        "link": "https://metacpan.org/pod/perlfunc#symlink-OLDFILE,NEWFILE"
+    },
+    {
+        "name": "syscall NUMBER, LIST  ",
+        "link": "https://metacpan.org/pod/perlfunc#syscall-NUMBER,-LIST"
+    },
+    {
+        "name": "sysopen FILEHANDLE,FILENAME,MODE ",
+        "link": "https://metacpan.org/pod/perlfunc#sysopen-FILEHANDLE,FILENAME,MODE"
+    },
+    {
+        "name": "sysopen FILEHANDLE,FILENAME,MODE,PERMS",
+        "link": "https://metacpan.org/pod/perlfunc#sysopen-FILEHANDLE,FILENAME,MODE,PERMS"
+    },
+    {
+        "name": "sysread FILEHANDLE,SCALAR,LENGTH,OFFSET ",
+        "link": "https://metacpan.org/pod/perlfunc#sysread-FILEHANDLE,SCALAR,LENGTH,OFFSET"
+    },
+    {
+        "name": "sysread FILEHANDLE,SCALAR,LENGTH",
+        "link": "https://metacpan.org/pod/perlfunc#sysread-FILEHANDLE,SCALAR,LENGTH"
+    },
+    {
+        "name": "sysseek FILEHANDLE,POSITION,WHENCE  ",
+        "link": "https://metacpan.org/pod/perlfunc#sysseek-FILEHANDLE,POSITION,WHENCE"
+    },
+    {
+        "name": "system LIST  ",
+        "link": "https://metacpan.org/pod/perlfunc#system-LIST"
+    },
+    {
+        "name": "system PROGRAM LIST",
+        "link": "https://metacpan.org/pod/perlfunc#system-PROGRAM-LIST"
+    },
+    {
+        "name": "syswrite FILEHANDLE,SCALAR,LENGTH,OFFSET ",
+        "link": "https://metacpan.org/pod/perlfunc#syswrite-FILEHANDLE,SCALAR,LENGTH,OFFSET"
+    },
+    {
+        "name": "syswrite FILEHANDLE,SCALAR,LENGTH",
+        "link": "https://metacpan.org/pod/perlfunc#syswrite-FILEHANDLE,SCALAR,LENGTH"
+    },
+    {
+        "name": "syswrite FILEHANDLE,SCALAR",
+        "link": "https://metacpan.org/pod/perlfunc#syswrite-FILEHANDLE,SCALAR"
+    },
+    {
+        "name": "tell FILEHANDLE ",
+        "link": "https://metacpan.org/pod/perlfunc#tell-FILEHANDLE"
+    },
+    {
+        "name": "tell",
+        "link": "https://metacpan.org/pod/perlfunc#tell1"
+    },
+    {
+        "name": "telldir DIRHANDLE ",
+        "link": "https://metacpan.org/pod/perlfunc#telldir-DIRHANDLE"
+    },
+    {
+        "name": "tie VARIABLE,CLASSNAME,LIST ",
+        "link": "https://metacpan.org/pod/perlfunc#tie-VARIABLE,CLASSNAME,LIST"
+    },
+    {
+        "name": "tied VARIABLE ",
+        "link": "https://metacpan.org/pod/perlfunc#tied-VARIABLE"
+    },
+    {
+        "name": "time  ",
+        "link": "https://metacpan.org/pod/perlfunc#time"
+    },
+    {
+        "name": "times ",
+        "link": "https://metacpan.org/pod/perlfunc#times"
+    },
+    {
+        "name": "tr///",
+        "link": "https://metacpan.org/pod/perlfunc#tr///"
+    },
+    {
+        "name": "truncate FILEHANDLE,LENGTH ",
+        "link": "https://metacpan.org/pod/perlfunc#truncate-FILEHANDLE,LENGTH"
+    },
+    {
+        "name": "truncate EXPR,LENGTH",
+        "link": "https://metacpan.org/pod/perlfunc#truncate-EXPR,LENGTH"
+    },
+    {
+        "name": "uc EXPR   ",
+        "link": "https://metacpan.org/pod/perlfunc#uc-EXPR"
+    },
+    {
+        "name": "uc",
+        "link": "https://metacpan.org/pod/perlfunc#uc1"
+    },
+    {
+        "name": "ucfirst EXPR  ",
+        "link": "https://metacpan.org/pod/perlfunc#ucfirst-EXPR"
+    },
+    {
+        "name": "ucfirst",
+        "link": "https://metacpan.org/pod/perlfunc#ucfirst1"
+    },
+    {
+        "name": "umask EXPR ",
+        "link": "https://metacpan.org/pod/perlfunc#umask-EXPR"
+    },
+    {
+        "name": "umask",
+        "link": "https://metacpan.org/pod/perlfunc#umask1"
+    },
+    {
+        "name": "undef EXPR  ",
+        "link": "https://metacpan.org/pod/perlfunc#undef-EXPR"
+    },
+    {
+        "name": "undef",
+        "link": "https://metacpan.org/pod/perlfunc#undef1"
+    },
+    {
+        "name": "unlink LIST     ",
+        "link": "https://metacpan.org/pod/perlfunc#unlink-LIST"
+    },
+    {
+        "name": "unlink",
+        "link": "https://metacpan.org/pod/perlfunc#unlink1"
+    },
+    {
+        "name": "unpack TEMPLATE,EXPR ",
+        "link": "https://metacpan.org/pod/perlfunc#unpack-TEMPLATE,EXPR"
+    },
+    {
+        "name": "unpack TEMPLATE",
+        "link": "https://metacpan.org/pod/perlfunc#unpack-TEMPLATE"
+    },
+    {
+        "name": "unshift ARRAY,LIST ",
+        "link": "https://metacpan.org/pod/perlfunc#unshift-ARRAY,LIST"
+    },
+    {
+        "name": "untie VARIABLE ",
+        "link": "https://metacpan.org/pod/perlfunc#untie-VARIABLE"
+    },
+    {
+        "name": "use Module VERSION LIST   ",
+        "link": "https://metacpan.org/pod/perlfunc#use-Module-VERSION-LIST"
+    },
+    {
+        "name": "use Module VERSION",
+        "link": "https://metacpan.org/pod/perlfunc#use-Module-VERSION"
+    },
+    {
+        "name": "use Module LIST",
+        "link": "https://metacpan.org/pod/perlfunc#use-Module-LIST"
+    },
+    {
+        "name": "use Module",
+        "link": "https://metacpan.org/pod/perlfunc#use-Module"
+    },
+    {
+        "name": "use VERSION",
+        "link": "https://metacpan.org/pod/perlfunc#use-VERSION"
+    },
+    {
+        "name": "utime LIST ",
+        "link": "https://metacpan.org/pod/perlfunc#utime-LIST"
+    },
+    {
+        "name": "values HASH ",
+        "link": "https://metacpan.org/pod/perlfunc#values-HASH"
+    },
+    {
+        "name": "values ARRAY",
+        "link": "https://metacpan.org/pod/perlfunc#values-ARRAY"
+    },
+    {
+        "name": "vec EXPR,OFFSET,BITS   ",
+        "link": "https://metacpan.org/pod/perlfunc#vec-EXPR,OFFSET,BITS"
+    },
+    {
+        "name": "wait ",
+        "link": "https://metacpan.org/pod/perlfunc#wait"
+    },
+    {
+        "name": "waitpid PID,FLAGS ",
+        "link": "https://metacpan.org/pod/perlfunc#waitpid-PID,FLAGS"
+    },
+    {
+        "name": "wantarray  ",
+        "link": "https://metacpan.org/pod/perlfunc#wantarray"
+    },
+    {
+        "name": "warn LIST   ",
+        "link": "https://metacpan.org/pod/perlfunc#warn-LIST"
+    },
+    {
+        "name": "write FILEHANDLE ",
+        "link": "https://metacpan.org/pod/perlfunc#write-FILEHANDLE"
+    },
+    {
+        "name": "write EXPR",
+        "link": "https://metacpan.org/pod/perlfunc#write-EXPR"
+    },
+    {
+        "name": "write",
+        "link": "https://metacpan.org/pod/perlfunc#write2"
+    },
+    {
+        "name": "y///",
+        "link": "https://metacpan.org/pod/perlfunc#y///"
+    }
+]
