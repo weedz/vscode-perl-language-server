@@ -824,6 +824,22 @@ export const builtin_functions: Record<string, Array<{
             ]
         }
     ],
+    "grep": [
+        {
+            "link": "https://metacpan.org/pod/perlfunc#grep-BLOCK-LIST",
+            "arguments": [
+                "BLOCK",
+                "LIST"
+            ]
+        },
+        {
+            "link": "https://metacpan.org/pod/perlfunc#grep-EXPR,LIST",
+            "arguments": [
+                "EXPR",
+                "LIST"
+            ]
+        }
+    ],
     "hex": [
         {
             "link": "https://metacpan.org/pod/perlfunc#hex-EXPR",
@@ -1056,6 +1072,22 @@ export const builtin_functions: Record<string, Array<{
         {
             "link": "https://metacpan.org/pod/perlfunc#lstat3",
             "arguments": []
+        }
+    ],
+    "map": [
+        {
+            "link": "https://metacpan.org/pod/perlfunc#map-BLOCK-LIST",
+            "arguments": [
+                "BLOCK",
+                "LIST"
+            ]
+        },
+        {
+            "link": "https://metacpan.org/pod/perlfunc#map-EXPR,LIST",
+            "arguments": [
+                "EXPR",
+                "LIST"
+            ]
         }
     ],
     "mkdir": [
@@ -1939,6 +1971,28 @@ export const builtin_functions: Record<string, Array<{
                 "DOMAIN",
                 "TYPE",
                 "PROTOCOL"
+            ]
+        }
+    ],
+    "sort": [
+        {
+            "link": "https://metacpan.org/pod/perlfunc#sort-SUBNAME-LIST",
+            "arguments": [
+                "SUBNAME",
+                "LIST"
+            ]
+        },
+        {
+            "link": "https://metacpan.org/pod/perlfunc#sort-BLOCK-LIST",
+            "arguments": [
+                "BLOCK",
+                "LIST"
+            ]
+        },
+        {
+            "link": "https://metacpan.org/pod/perlfunc#sort-LIST",
+            "arguments": [
+                "LIST"
             ]
         }
     ],
