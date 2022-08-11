@@ -628,6 +628,7 @@ function processContent(documentURI: string, content: string) {
 				}
 			
 				if (j < packageTree.length - 1) {
+					// The same package name can be defined in multiple files. This code is to keep track of how many files declare a specific package
 					// FIXME: This is not the nicest thing i've seen...
 					if (PACKAGES[fullPackageTree].packages[packageTree[j+1]]) {
 						PACKAGES[fullPackageTree].packages[packageTree[j+1]]++;
@@ -774,6 +775,8 @@ export function readSingleFile(documentURI: string, fileContent: string): void {
 export function clearDefinitions(documentURI: string): void {
 	DEBUG_MEASURE_TIME && console.time(`clearDefinitions(): ${documentURI}`);
 	const file = FILES[documentURI];
+
+	// Early return if this file has not been processed yet
 	if (!file) {
 		DEBUG_MEASURE_TIME && console.timeEnd(`clearDefinitions(): ${documentURI}`);
 		return;
@@ -804,6 +807,17 @@ export function clearDefinitions(documentURI: string): void {
 		PACKAGES[packageName].locations.splice(PACKAGES[packageName].locations.findIndex(l => l.file === documentURI)>>>0, 1);
 		if (PACKAGES[packageName].locations.length === 0) {
 			delete PACKAGES[packageName];
+		}
+
+		// Remove references to packageName from parent PACKAGES
+		const lastSeperatorIndex = packageName.lastIndexOf("::");
+		const containingPackage = lastSeperatorIndex !== -1 ? packageName.slice(0, lastSeperatorIndex) : packageName;
+		if (containingPackage && PACKAGES[containingPackage]) {
+			const lastPackagePart = lastSeperatorIndex !== -1 ? packageName.slice(lastSeperatorIndex + 2) : packageName;
+			PACKAGES[containingPackage].packages[lastPackagePart]--;
+			if (PACKAGES[containingPackage].packages[lastPackagePart] <= 0) {
+				delete PACKAGES[containingPackage].packages[lastPackagePart];
+			}
 		}
 	}
 	
