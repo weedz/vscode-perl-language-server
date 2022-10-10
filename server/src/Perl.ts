@@ -556,6 +556,7 @@ function getIdentifierNameAtPosition(textDocument: TextDocumentIdentifier, posit
 
 const defs = {
 	function: /^\s*sub\s+([a-zA-Z0-9_]+)/,
+	typeglob: /^[*]{1}([a-zA-Z0-9_]+)/,
 	package: /^package\s+([a-zA-Z0-9:_]+);/,
 	file: /[.](?:pm|pl|fcgi)$/,
 };
@@ -644,6 +645,40 @@ function processContent(documentURI: string, content: string) {
 
 			filePackageName = packageName;
 		}
+
+		// Assume "typeglobs" is a code ref (?)
+		const typeglobDefinition = line.match(defs.typeglob)?.[1];
+		if (typeglobDefinition) {
+			const packageName = filePackageName || "main";
+			if (!(typeglobDefinition in FUNCTION_MAP)) {
+				FUNCTION_MAP[typeglobDefinition] = {};
+			}
+			FUNCTION_MAP[typeglobDefinition][documentURI] = {
+				package: packageName,
+				location: {
+					file: documentURI,
+					line: i + 1
+				}
+			};
+			PACKAGES[packageName].functions.add(typeglobDefinition);
+
+			const packageAndFunction = `${packageName}::${typeglobDefinition}`;
+			if (!(packageAndFunction in FUNCTIONS)) {
+				FUNCTIONS[packageAndFunction] = [];
+			}
+
+			FUNCTIONS[packageAndFunction].push({
+				file: documentURI,
+				line: i + 1,
+			});
+
+			functions[packageAndFunction] = {
+				line: i + 1,
+				endLine: i + 1,
+				arguments: [],
+			};
+		}
+
 		const functionDefinition = line.match(defs.function)?.[1];
 		if (functionDefinition) {
 			readArgs.reading = true;
