@@ -812,7 +812,8 @@ export function clearDefinitions(documentURI: string): void {
 		// Remove references to packageName from parent PACKAGES
 		const lastSeperatorIndex = packageName.lastIndexOf("::");
 		const containingPackage = lastSeperatorIndex !== -1 ? packageName.slice(0, lastSeperatorIndex) : packageName;
-		if (containingPackage && PACKAGES[containingPackage]) {
+		const isMain = lastSeperatorIndex === -1 && containingPackage === "main";
+		if (!isMain && containingPackage && PACKAGES[containingPackage]) {
 			const lastPackagePart = lastSeperatorIndex !== -1 ? packageName.slice(lastSeperatorIndex + 2) : packageName;
 			PACKAGES[containingPackage].packages[lastPackagePart]--;
 			if (PACKAGES[containingPackage].packages[lastPackagePart] <= 0) {
