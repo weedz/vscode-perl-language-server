@@ -785,8 +785,6 @@ function parseFunctionArgs(line: string) {
 	return args;
 }
 
-const debounceFileProcess: Record<string, NodeJS.Timeout> = {};
-
 function clearAndProcessDefinitions(documentURI: string, fileContent: string) {
 	DEBUG_MEASURE_TIME && DEBUG_MEASURE_SINGLE_FILE && console.time(`readSingleFile: ${documentURI}`);
 	clearDefinitions(documentURI);
@@ -796,15 +794,7 @@ function clearAndProcessDefinitions(documentURI: string, fileContent: string) {
 
 // TODO: Move this to a Worker thread?
 export function readSingleFile(documentURI: string, fileContent: string): void {
-	if (!(documentURI in debounceFileProcess)) {
-		clearAndProcessDefinitions(documentURI, fileContent);
-	} else {
-		clearTimeout(debounceFileProcess[documentURI]);
-		debounceFileProcess[documentURI] = setTimeout(() => {
-			clearAndProcessDefinitions(documentURI, fileContent);
-			delete debounceFileProcess[documentURI];
-		}, 200);
-	}
+	clearAndProcessDefinitions(documentURI, fileContent);
 }
 
 export function clearDefinitions(documentURI: string): void {
