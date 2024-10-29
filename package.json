@@ -1,77 +1,73 @@
 {
-	"name": "perl-lsp",
-	"description": "Perl language server",
-	"author": "Linus Björklund",
-	"license": "MIT",
-	"version": "1.0.14",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/weedz/vscode-perl-language-server"
-	},
-	"publisher": "linus-bjorklund",
-	"engines": {
-		"vscode": "^1.63.0",
-		"node": "^18"
-	},
-	"activationEvents": [
-		"onLanguage:perl"
-	],
-	"main": "./out/extension",
-	"contributes": {
-		"configuration": {
-			"type": "object",
-			"title": "Perl language server",
-			"properties": {
-				"perlLanguageServer.maxNumberOfProblems": {
-					"scope": "resource",
-					"type": "number",
-					"default": 100,
-					"description": "Controls the maximum number of problems produced by the server."
-				},
-				"perlLanguageServer.ignoreFolders": {
-					"scope": "window",
-					"type": "array",
-					"items": {
-						"type": "string"
-					},
-					"description": "Folders to exclude"
-				},
-				"perlLanguageServer.trace.server": {
-					"scope": "window",
-					"type": "string",
-					"enum": [
-						"off",
-						"messages",
-						"verbose"
-					],
-					"default": "off",
-					"description": "Traces the communication between VS Code and the language server."
-				}
-			}
-		}
-	},
-	"workspaces": [
-		"client",
-		"server"
-	],
-	"scripts": {
-		"lint": "eslint ./client/src ./server/src --ext .ts,.tsx && tsc --noEmit",
-		"build": "rm -r out; npm run esbuild-base && npm run swc",
-		"vscode:prepublish": "npm run build && mkdir -p out/node_modules && cp -R node_modules/fsevents out/node_modules",
-		"esbuild-base": "esbuild extension=./client/src/extension.ts server=./server/src/server.ts --bundle --outdir=out --external:vscode --external:fsevents --format=cjs --platform=node",
-		"swc": "swc out/extension.js out/server.js -d out",
-		"esbuild": "npm run esbuild-base -- --sourcemap",
-		"watch": "npm run esbuild-base -- --sourcemap --watch"
-	},
-	"devDependencies": {
-		"@swc/cli": "^0.1.57",
-		"@swc/core": "^1.2.170",
-		"@types/node": "^18.0.0",
-		"@typescript-eslint/eslint-plugin": "^5.13.0",
-		"@typescript-eslint/parser": "^5.13.0",
-		"esbuild": "^0.15.10",
-		"eslint": "^8.10.0",
-		"eslint-plugin-import": "^2.26.0",
-		"typescript": "^4.6.2"
-	}
+  "name": "perl-lsp",
+  "description": "Perl language server",
+  "author": "Linus Björklund",
+  "license": "MIT",
+  "version": "1.0.15",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/weedz/vscode-perl-language-server"
+  },
+  "publisher": "linus-bjorklund",
+  "engines": {
+    "vscode": "^1.94.0",
+    "node": "^20"
+  },
+  "activationEvents": [
+    "onLanguage:perl"
+  ],
+  "main": "./out/extension",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Perl language server",
+      "properties": {
+        "perlLanguageServer.maxNumberOfProblems": {
+          "scope": "resource",
+          "type": "number",
+          "default": 100,
+          "description": "Controls the maximum number of problems produced by the server."
+        },
+        "perlLanguageServer.ignoreFolders": {
+          "scope": "window",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Folders to exclude"
+        },
+        "perlLanguageServer.trace.server": {
+          "scope": "window",
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Traces the communication between VS Code and the language server."
+        }
+      }
+    }
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "build": "rm -r out; npm run esbuild-base && npm run swc",
+    "vscode:prepublish": "npm run build && mkdir -p out/node_modules",
+    "esbuild-base": "esbuild extension=./client/src/extension.ts server=./server/src/server.ts --bundle --outdir=out --external:vscode --external:fsevents --format=cjs --platform=node",
+    "swc": "swc out/extension.js out/server.js --strip-leading-paths --out-dir out",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "watch": "npm run esbuild-base -- --sourcemap --watch"
+  },
+  "devDependencies": {
+    "@swc/cli": "0.4.1-nightly.20240914",
+    "@swc/core": "^1.7.40",
+    "@types/node": "^22.8.4",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.6.3"
+  },
+  "packageManager": "npm@10.9.0+sha512.65a9c38a8172948f617a53619762cd77e12b9950fe1f9239debcb8d62c652f2081824b986fee7c0af6c0a7df615becebe4bf56e17ec27214a87aa29d9e038b4b"
 }
