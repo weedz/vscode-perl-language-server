@@ -3,7 +3,7 @@
   "description": "Perl language server",
   "author": "Linus Björklund",
   "license": "MIT",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "repository": {
     "type": "git",
     "url": "https://github.com/weedz/vscode-perl-language-server"
@@ -56,6 +56,7 @@
   ],
   "scripts": {
     "build": "rm -r out; npm run esbuild-base && npm run swc",
+    "build:vsce": "vsce package",
     "vscode:prepublish": "npm run build && mkdir -p out/node_modules",
     "esbuild-base": "esbuild extension=./client/src/extension.ts server=./server/src/server.ts --bundle --outdir=out --external:vscode --external:fsevents --format=cjs --platform=node",
     "swc": "swc out/extension.js out/server.js --strip-leading-paths --out-dir out",
@@ -66,9 +67,9 @@
     "@swc/cli": "^0.6.0",
     "@swc/core": "^1.7.40",
     "@types/node": "^22.8.4",
-    "@vscode/vsce": "^3.2.2",
+    "@vscode/vsce": "^3.6.0",
     "esbuild": "^0.25.1",
-    "typescript": "^5.6.3"
+    "typescript": "^5.8.3"
   },
   "packageManager": "npm@10.9.2+sha512.8ab88f10f224a0c614cb717a7f7c30499014f77134120e9c1f0211ea3cf3397592cbe483feb38e0c4b3be1c54e347292c76a1b5edb94a3289d5448484ab8ac81"
 }
